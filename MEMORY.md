@@ -44,6 +44,9 @@
    - Eliminación de la directiva obsoleta `version: '3.8'` en `docker-compose.yml`.
    - Creación de `.env.example` con la plantilla de configuración recomendada.
    - Verificación de compilación limpia (`pnpm run build`) y validación estricta con linter (`oxlint --type-aware`: 0 errores, 0 warnings en 72 archivos).
+   - **Corrección de dependencias circulares en ESM:** Aplicación de `Relation<T>` de TypeORM en todas las relaciones de entidades (`Agreement`, `Meeting`, `Contract`, `Company`, `Worker`) para evitar `ReferenceError: Cannot access 'X' before initialization` causado por `emitDecoratorMetadata` en módulos ES (`"type": "module"`).
+   - **Resolución de conflicto de migración TypeORM en MySQL 8:** Limpieza de filas de prueba de la versión anterior en `meetings` y `contracts` para permitir la sincronización de columnas `NOT NULL` sin colisionar con el modo estricto `NO_ZERO_DATE` de MySQL.
+   - Integración de documentación Swagger en `/docs` vía `@nestjs/swagger`.
 
 ---
 

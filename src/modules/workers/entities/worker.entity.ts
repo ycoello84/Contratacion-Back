@@ -7,6 +7,7 @@ import {
   ManyToMany,
   ManyToOne,
   PrimaryGeneratedColumn,
+  type Relation,
   UpdateDateColumn,
 } from 'typeorm';
 import { Company } from '../../companies/entities/company.entity.js';
@@ -45,8 +46,8 @@ export class Worker {
 
   @ManyToOne(() => Company, { nullable: true, onDelete: 'SET NULL' })
   @JoinColumn({ name: 'empresa_id' })
-  empresa: Company | null;
+  empresa: Relation<Company> | null;
 
   @ManyToMany(() => Meeting, (meeting) => meeting.trabajadores)
-  reuniones: Meeting[];
+  reuniones: Relation<Meeting>[];
 }

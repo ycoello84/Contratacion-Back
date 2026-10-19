@@ -7,6 +7,7 @@ import {
   ManyToOne,
   OneToMany,
   PrimaryGeneratedColumn,
+  type Relation,
   UpdateDateColumn,
 } from 'typeorm';
 import { Contract } from '../../contracts/entities/contract.entity.js';
@@ -58,10 +59,10 @@ export class Company {
     onDelete: 'SET NULL',
   })
   @JoinColumn({ name: 'parent_empresa_id' })
-  parentEmpresa: Company | null;
+  parentEmpresa: Relation<Company> | null;
 
   @OneToMany(() => Company, (company) => company.parentEmpresa)
-  uebs: Company[];
+  uebs: Relation<Company>[];
 
   @CreateDateColumn()
   createdAt: Date;
@@ -70,8 +71,8 @@ export class Company {
   updatedAt: Date;
 
   @OneToMany(() => Contract, (contract) => contract.empresaOrigen)
-  contratosComoOrigen: Contract[];
+  contratosComoOrigen: Relation<Contract>[];
 
   @OneToMany(() => Contract, (contract) => contract.empresaDestino)
-  contratosComoDestino: Contract[];
+  contratosComoDestino: Relation<Contract>[];
 }

@@ -6,6 +6,7 @@ import {
   JoinColumn,
   ManyToOne,
   PrimaryGeneratedColumn,
+  type Relation,
   UpdateDateColumn,
 } from 'typeorm';
 import { Contract } from '../../contracts/entities/contract.entity.js';
@@ -29,14 +30,14 @@ export class Agreement {
     onDelete: 'CASCADE',
   })
   @JoinColumn({ name: 'acta_cc_id' })
-  actaCc: Meeting;
+  actaCc: Relation<Meeting>;
 
   @Column({ name: 'contrato_id', type: 'int', nullable: true })
   contratoId: number | null;
 
   @ManyToOne(() => Contract, { nullable: true, onDelete: 'SET NULL' })
   @JoinColumn({ name: 'contrato_id' })
-  contrato: Contract | null;
+  contrato: Relation<Contract> | null;
 
   @Column({ type: 'varchar', length: 120, nullable: true })
   punto: string | null;
@@ -49,7 +50,7 @@ export class Agreement {
 
   @ManyToOne(() => Worker, { onDelete: 'RESTRICT' })
   @JoinColumn({ name: 'responsable_id' })
-  responsable: Worker;
+  responsable: Relation<Worker>;
 
   @Column({ name: 'fecha_cumplimiento', type: 'date' })
   fechaCumplimiento: string;

@@ -7,6 +7,7 @@ import {
   ManyToMany,
   OneToMany,
   PrimaryGeneratedColumn,
+  type Relation,
   UpdateDateColumn,
 } from 'typeorm';
 import { Agreement } from '../../agreements/entities/agreement.entity.js';
@@ -49,11 +50,11 @@ export class Meeting {
       referencedColumnName: 'id',
     },
   })
-  trabajadores: Worker[];
+  trabajadores: Relation<Worker>[];
 
   @OneToMany(() => Contract, (contract) => contract.actaCc)
-  contratos: Contract[];
+  contratos: Relation<Contract>[];
 
   @OneToMany(() => Agreement, (agreement) => agreement.actaCc)
-  acuerdos: Agreement[];
+  acuerdos: Relation<Agreement>[];
 }
