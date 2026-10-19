@@ -1,0 +1,17 @@
+services:
+  mysql-db:
+    image: mysql:8.0
+    container_name: contratacion-mysql
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword   # Cambia esto por una contraseña segura
+      MYSQL_DATABASE: contratacion_db      # Nombre de la base de datos que se creará
+      MYSQL_USER: user_contratacion        # Usuario adicional (opcional)
+      MYSQL_PASSWORD: userpassword         # Contraseña del usuario (opcional)
+    ports:
+      - "3307:3306"                        # Mapea el puerto del contenedor al host
+    volumes:
+      - mysql_data:/var/lib/mysql          # Persiste los datos aunque el contenedor se elimine
+
+volumes:
+  mysql_data:

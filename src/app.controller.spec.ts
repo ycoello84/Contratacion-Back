@@ -15,8 +15,15 @@ describe('AppController', () => {
   });
 
   describe('root', () => {
-    it('should return "Hello World!"', () => {
-      expect(appController.getHello()).toBe('Hello World!');
+    it('should return app info', () => {
+      const info = appController.getInfo();
+      expect(info.nombre).toBe('contratacion-back');
+      expect(info.version).toBe('0.0.1');
+    });
+
+    it('should return health status', () => {
+      const health = appController.getHealth();
+      expect(health.status).toBe('ok');
     });
   });
 });
