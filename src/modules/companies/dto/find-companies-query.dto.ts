@@ -15,12 +15,11 @@ export class FindCompaniesQueryDto extends PaginationQueryDto {
     if (value === 'false' || value === false) return false;
     return value;
   })
-  esUeb?: boolean;
+  isUeb?: boolean;
 
   @IsOptional()
   @IsInt()
   @Min(1)
   @Transform(({ value }) => (value !== undefined ? Number(value) : undefined))
-  parentEmpresaId?: number;
+  parentCompanyId?: number;
 }
-

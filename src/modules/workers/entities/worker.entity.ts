@@ -19,24 +19,24 @@ export class Worker {
   id: number;
 
   @Column({ name: 'nombre_completo', type: 'varchar', length: 160 })
-  nombreCompleto: string;
+  fullName: string;
 
   @Column({ type: 'varchar', length: 120, nullable: true })
-  cargo: string | null;
+  position: string | null;
 
   @Index('idx_workers_email')
   @Column({ type: 'varchar', length: 180, nullable: true })
   email: string | null;
 
   @Column({ name: 'empresa_id', type: 'int', nullable: true })
-  empresaId: number | null;
+  companyId: number | null;
 
   @Index('idx_workers_es_miembro_cc')
   @Column({ name: 'es_miembro_cc', type: 'boolean', default: false })
-  esMiembroCc: boolean;
+  isCcMember: boolean;
 
   @Column({ name: 'cargo_cc', type: 'varchar', length: 100, nullable: true })
-  cargoCc: string | null;
+  ccPosition: string | null;
 
   @CreateDateColumn()
   createdAt: Date;
@@ -46,8 +46,8 @@ export class Worker {
 
   @ManyToOne(() => Company, { nullable: true, onDelete: 'SET NULL' })
   @JoinColumn({ name: 'empresa_id' })
-  empresa: Relation<Company> | null;
+  company: Relation<Company> | null;
 
-  @ManyToMany(() => Meeting, (meeting) => meeting.trabajadores)
-  reuniones: Relation<Meeting>[];
+  @ManyToMany(() => Meeting, (meeting) => meeting.workers)
+  meetings: Relation<Meeting>[];
 }

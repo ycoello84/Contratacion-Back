@@ -62,30 +62,30 @@ describe('AgreementsService', () => {
 
   describe('create', () => {
     it('should create an agreement when inputs are valid', async () => {
-      mockRepository.findOne.mockResolvedValue(null); // No duplicate numeroAcuerdo
+      mockRepository.findOne.mockResolvedValue(null); // No duplicate agreementNumber
       mockMeetingsRepository.findOne.mockResolvedValue({ id: 1 });
       mockWorkersRepository.findOne.mockResolvedValue({ id: 2 });
       mockRepository.create.mockReturnValue({
         id: 1,
-        numeroAcuerdo: 'Acuerdo 01-2026',
-        actaCcId: 1,
-        detalle: 'Detalle de prueba',
-        responsableId: 2,
-        fechaCumplimiento: '2026-12-31',
-        estadoCumplimiento: AgreementStatus.PENDIENTE,
+        agreementNumber: 'Acuerdo 01-2026',
+        actCcId: 1,
+        detail: 'Detalle de prueba',
+        responsibleId: 2,
+        complianceDate: '2026-12-31',
+        complianceStatus: AgreementStatus.PENDIENTE,
       });
       mockRepository.save.mockResolvedValue({ id: 1 });
       mockRepository.findOne.mockResolvedValueOnce(null).mockResolvedValueOnce({
         id: 1,
-        numeroAcuerdo: 'Acuerdo 01-2026',
+        agreementNumber: 'Acuerdo 01-2026',
       });
 
       const result = await service.create({
-        numeroAcuerdo: 'Acuerdo 01-2026',
-        actaCcId: 1,
-        detalle: 'Detalle de prueba',
-        responsableId: 2,
-        fechaCumplimiento: '2026-12-31',
+        agreementNumber: 'Acuerdo 01-2026',
+        actCcId: 1,
+        detail: 'Detalle de prueba',
+        responsibleId: 2,
+        complianceDate: '2026-12-31',
       });
 
       expect(result).toBeDefined();

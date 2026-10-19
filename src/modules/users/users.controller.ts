@@ -47,12 +47,12 @@ export class UsersController {
     @CurrentUser() currentUser: AuthenticatedUser,
   ): Promise<SafeUser> {
     if (currentUser.id === id) {
-      if (updateUserDto.activo === false) {
+      if (updateUserDto.active === false) {
         throw new BadRequestException(
           'No es posible desactivar la cuenta propia.',
         );
       }
-      if (updateUserDto.rol && updateUserDto.rol !== currentUser.rol) {
+      if (updateUserDto.role && updateUserDto.role !== currentUser.role) {
         throw new BadRequestException(
           'No es posible modificar el rol de la cuenta propia.',
         );

@@ -21,14 +21,14 @@ export class User {
   passwordHash: string;
 
   @Column({ type: 'varchar', length: 120 })
-  nombre: string;
+  name: string;
 
   @Index('idx_users_rol')
   @Column({ type: 'enum', enum: UserRole, default: UserRole.LECTOR })
-  rol: UserRole;
+  role: UserRole;
 
   @Column({ type: 'boolean', default: true })
-  activo: boolean;
+  active: boolean;
 
   @CreateDateColumn()
   createdAt: Date;

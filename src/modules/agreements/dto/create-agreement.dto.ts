@@ -16,40 +16,40 @@ export class CreateAgreementDto {
   @IsNotEmpty()
   @MaxLength(60)
   @Transform(({ value }) => (typeof value === 'string' ? value.trim() : value))
-  numeroAcuerdo: string;
+  agreementNumber: string;
 
   @IsInt()
   @Min(1)
-  actaCcId: number;
+  actCcId: number;
 
   @IsOptional()
   @IsInt()
   @Min(1)
-  contratoId?: number;
+  contractId?: number;
 
   @IsOptional()
   @IsString()
   @MaxLength(120)
   @Transform(({ value }) => (typeof value === 'string' ? value.trim() : value))
-  punto?: string;
+  point?: string;
 
   @IsString()
   @IsNotEmpty()
-  detalle: string;
+  detail: string;
 
   @IsInt()
   @Min(1)
-  responsableId: number;
+  responsibleId: number;
 
   @IsDateString(
     {},
     { message: 'La fecha límite de cumplimiento debe tener un formato válido.' },
   )
-  fechaCumplimiento: string;
+  complianceDate: string;
 
   @IsOptional()
   @IsEnum(AgreementStatus, {
     message: 'El estado de cumplimiento debe ser CUMPLIDO, NO_CUMPLIDO o PENDIENTE.',
   })
-  estadoCumplimiento?: AgreementStatus;
+  complianceStatus?: AgreementStatus;
 }

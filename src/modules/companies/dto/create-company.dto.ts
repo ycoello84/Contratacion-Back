@@ -15,7 +15,7 @@ export class CreateCompanyDto {
   @IsNotEmpty()
   @MaxLength(200)
   @Transform(({ value }) => (typeof value === 'string' ? value.trim() : value))
-  razonSocial: string;
+  businessName: string;
 
   @IsString()
   @IsNotEmpty()
@@ -23,36 +23,35 @@ export class CreateCompanyDto {
   @Transform(({ value }) =>
     typeof value === 'string' ? value.trim().toUpperCase() : value,
   )
-  identificacionFiscal: string;
+  taxId: string;
 
   @IsOptional()
   @IsString()
   @MaxLength(64)
   @Transform(({ value }) => (typeof value === 'string' ? value.trim() : value))
-  siglas?: string;
+  acronym?: string;
 
   @IsOptional()
   @IsString()
   @MaxLength(255)
-  direccion?: string;
+  address?: string;
 
   @IsOptional()
   @IsString()
   @MaxLength(32)
-  telefono?: string;
+  phone?: string;
 
   @IsOptional()
   @IsEmail({}, { message: 'El email de contacto debe tener un formato válido.' })
   @MaxLength(180)
-  emailContacto?: string;
+  contactEmail?: string;
 
   @IsOptional()
   @IsBoolean()
-  esUeb?: boolean;
+  isUeb?: boolean;
 
   @IsOptional()
   @IsInt()
   @Min(1)
-  parentEmpresaId?: number;
+  parentCompanyId?: number;
 }
-

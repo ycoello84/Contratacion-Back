@@ -25,15 +25,15 @@ export class WorkersService {
   ) {}
 
   async create(createWorkerDto: CreateWorkerDto): Promise<Worker> {
-    await this.ensureCompanyExists(createWorkerDto.empresaId);
+    await this.ensureCompanyExists(createWorkerDto.companyId);
 
     const worker = this.repository.create({
-      nombreCompleto: createWorkerDto.nombreCompleto,
-      cargo: createWorkerDto.cargo ?? null,
+      fullName: createWorkerDto.fullName,
+      position: createWorkerDto.position ?? null,
       email: createWorkerDto.email ?? null,
-      empresaId: createWorkerDto.empresaId ?? null,
-      esMiembroCc: createWorkerDto.esMiembroCc ?? false,
-      cargoCc: createWorkerDto.cargoCc ?? null,
+      companyId: createWorkerDto.companyId ?? null,
+      isCcMember: createWorkerDto.isCcMember ?? false,
+      ccPosition: createWorkerDto.ccPosition ?? null,
     });
 
     const saved = await this.repository.save(worker);
@@ -43,24 +43,24 @@ export class WorkersService {
   async findAll(query: FindWorkersQueryDto): Promise<PaginatedResult<Worker>> {
     const qb = this.repository
       .createQueryBuilder('worker')
-      .leftJoinAndSelect('worker.empresa', 'empresa');
+      .leftJoinAndSelect('worker.company', 'company');
 
     if (query.search) {
       qb.andWhere(
-        '(worker.nombreCompleto LIKE :search OR worker.email LIKE :search OR worker.cargo LIKE :search OR worker.cargoCc LIKE :search)',
+        '(worker.fullName LIKE :search OR worker.email LIKE :search OR worker.position LIKE :search OR worker.ccPosition LIKE :search)',
         { search: `%${query.search}%` },
       );
     }
 
-    if (query.empresaId) {
-      qb.andWhere('worker.empresaId = :empresaId', {
-        empresaId: query.empresaId,
+    if (query.companyId) {
+      qb.andWhere('worker.companyId = :companyId', {
+        companyId: query.companyId,
       });
     }
 
-    if (query.esMiembroCc !== undefined) {
-      qb.andWhere('worker.esMiembroCc = :esMiembroCc', {
-        esMiembroCc: query.esMiembroCc,
+    if (query.isCcMember !== undefined) {
+      qb.andWhere('worker.isCcMember = :isCcMember', {
+        isCcMember: query.isCcMember,
       });
     }
 
@@ -76,7 +76,7 @@ export class WorkersService {
   async findOne(id: number): Promise<Worker> {
     const worker = await this.repository.findOne({
       where: { id },
-      relations: { empresa: true },
+      relations: { company: true },
     });
 
     if (!worker) {
@@ -89,31 +89,31 @@ export class WorkersService {
   async update(id: number, updateWorkerDto: UpdateWorkerDto): Promise<Worker> {
     const worker = await this.findOne(id);
 
-    if (updateWorkerDto.empresaId !== undefined) {
-      if (updateWorkerDto.empresaId !== null) {
-        await this.ensureCompanyExists(updateWorkerDto.empresaId);
+    if (updateWorkerDto.companyId !== undefined) {
+      if (updateWorkerDto.companyId !== null) {
+        await this.ensureCompanyExists(updateWorkerDto.companyId);
       }
-      worker.empresaId = updateWorkerDto.empresaId;
+      worker.companyId = updateWorkerDto.companyId;
     }
 
-    if (updateWorkerDto.nombreCompleto !== undefined) {
-      worker.nombreCompleto = updateWorkerDto.nombreCompleto;
+    if (updateWorkerDto.fullName !== undefined) {
+      worker.fullName = updateWorkerDto.fullName;
     }
 
-    if (updateWorkerDto.cargo !== undefined) {
-      worker.cargo = updateWorkerDto.cargo;
+    if (updateWorkerDto.position !== undefined) {
+      worker.position = updateWorkerDto.position;
     }
 
     if (updateWorkerDto.email !== undefined) {
       worker.email = updateWorkerDto.email;
     }
 
-    if (updateWorkerDto.esMiembroCc !== undefined) {
-      worker.esMiembroCc = updateWorkerDto.esMiembroCc;
+    if (updateWorkerDto.isCcMember !== undefined) {
+      worker.isCcMember = updateWorkerDto.isCcMember;
     }
 
-    if (updateWorkerDto.cargoCc !== undefined) {
-      worker.cargoCc = updateWorkerDto.cargoCc;
+    if (updateWorkerDto.ccPosition !== undefined) {
+      worker.ccPosition = updateWorkerDto.ccPosition;
     }
 
     await this.repository.save(worker);
@@ -131,18 +131,18 @@ export class WorkersService {
     await this.repository.remove(worker);
   }
 
-  private async ensureCompanyExists(empresaId?: number): Promise<void> {
-    if (!empresaId) {
+  private async ensureCompanyExists(companyId?: number): Promise<void> {
+    if (!companyId) {
       return;
     }
 
     const company = await this.companiesRepository.findOne({
-      where: { id: empresaId },
+      where: { id: companyId },
     });
 
     if (!company) {
       throw new NotFoundException(
-        `La empresa con id ${empresaId} no existe en el sistema.`,
+        `La empresa con id ${companyId} no existe en el sistema.`,
       );
     }
   }

@@ -19,78 +19,78 @@ export class CreateContractDto {
   @IsNotEmpty()
   @MaxLength(60)
   @Transform(({ value }) => (typeof value === 'string' ? value.trim() : value))
-  noContrato: string;
+  contractNumber: string;
 
   @IsOptional()
   @IsEnum(ContractType)
-  tipoRelacionContractual?: ContractType;
+  contractRelationshipType?: ContractType;
 
   @IsOptional()
   @IsInt()
   @Min(1)
-  contratoPadreId?: number;
+  parentContractId?: number;
 
   @IsString()
   @IsNotEmpty()
-  objeto: string;
+  object: string;
 
   @IsInt()
   @Min(1)
-  empresaOrigenId: number;
+  originCompanyId: number;
 
   @IsInt()
   @Min(1)
-  empresaDestinoId: number;
+  destinationCompanyId: number;
 
   @IsOptional()
   @IsString()
   @MaxLength(120)
   @Transform(({ value }) => (typeof value === 'string' ? value.trim() : value))
-  areaEspecializada?: string;
+  specializedArea?: string;
 
   @IsOptional()
   @IsNumberString(
     {},
     { message: 'El valor debe ser una cadena numérica o decimal válida.' },
   )
-  valor?: string;
+  value?: string;
 
   @IsOptional()
   @IsBoolean()
-  sinValorRefiere?: boolean;
+  noValueReference?: boolean;
 
   @IsOptional()
   @IsDateString(
     {},
     { message: 'La fecha de entrada a la UEB debe tener un formato válido.' },
   )
-  fechaEntradaUeb?: string;
+  uebEntryDate?: string;
 
   @IsOptional()
   @IsDateString(
     {},
     { message: 'La fecha de emisión del dictamen debe tener un formato válido.' },
   )
-  fechaEmisionDictamen?: string;
+  opinionIssueDate?: string;
 
   @IsDateString({}, { message: 'La fecha de inicio debe tener un formato válido.' })
-  fechaInicio: string;
+  startDate: string;
 
   @IsOptional()
   @IsDateString(
     {},
     { message: 'La fecha de vencimiento debe tener un formato válido.' },
   )
-  fechaVencimiento?: string;
+  expirationDate?: string;
 
   @IsOptional()
   @IsEnum(ContractApprovalStatus, {
     message: 'El estado de aprobación del CC no es válido.',
   })
-  estadoAprobacionCc?: ContractApprovalStatus;
+  ccApprovalStatus?: ContractApprovalStatus;
 
   @IsOptional()
   @IsInt()
   @Min(1)
-  actaCcId?: number;
+  actCcId?: number;
 }

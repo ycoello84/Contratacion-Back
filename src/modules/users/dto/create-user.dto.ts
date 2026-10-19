@@ -18,6 +18,7 @@ export class CreateUserDto {
   email: string;
 
   @IsString()
+  @IsNotEmpty()
   @MinLength(8, { message: 'La contraseña debe tener al menos 8 caracteres.' })
   @MaxLength(72, { message: 'La contraseña no puede superar los 72 caracteres.' })
   password: string;
@@ -26,13 +27,13 @@ export class CreateUserDto {
   @IsNotEmpty()
   @MaxLength(120)
   @Transform(({ value }) => (typeof value === 'string' ? value.trim() : value))
-  nombre: string;
+  name: string;
 
   @IsOptional()
   @IsEnum(UserRole, { message: 'El rol debe ser ADMIN, GESTOR o LECTOR.' })
-  rol: UserRole = UserRole.LECTOR;
+  role: UserRole = UserRole.LECTOR;
 
   @IsOptional()
   @IsBoolean()
-  activo: boolean = true;
+  active: boolean = true;
 }

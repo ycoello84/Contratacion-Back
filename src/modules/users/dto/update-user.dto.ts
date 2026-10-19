@@ -27,13 +27,13 @@ export class UpdateUserDto {
   @IsString()
   @MaxLength(120)
   @Transform(({ value }) => (typeof value === 'string' ? value.trim() : value))
-  nombre?: string;
+  name?: string;
 
   @IsOptional()
   @IsEnum(UserRole, { message: 'El rol debe ser ADMIN, GESTOR o LECTOR.' })
-  rol?: UserRole;
+  role?: UserRole;
 
   @IsOptional()
   @IsBoolean()
-  activo?: boolean;
+  active?: boolean;
 }

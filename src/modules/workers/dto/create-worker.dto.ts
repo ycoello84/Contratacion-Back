@@ -15,12 +15,12 @@ export class CreateWorkerDto {
   @IsNotEmpty()
   @MaxLength(160)
   @Transform(({ value }) => (typeof value === 'string' ? value.trim() : value))
-  nombreCompleto: string;
+  fullName: string;
 
   @IsOptional()
   @IsString()
   @MaxLength(120)
-  cargo?: string;
+  position?: string;
 
   @IsOptional()
   @IsEmail({}, { message: 'El email debe tener un formato válido.' })
@@ -30,15 +30,15 @@ export class CreateWorkerDto {
   @IsOptional()
   @IsInt()
   @Min(1)
-  empresaId?: number;
+  companyId?: number;
 
   @IsOptional()
   @IsBoolean()
-  esMiembroCc?: boolean;
+  isCcMember?: boolean;
 
   @IsOptional()
   @IsString()
   @MaxLength(100)
   @Transform(({ value }) => (typeof value === 'string' ? value.trim() : value))
-  cargoCc?: string;
+  ccPosition?: string;
 }

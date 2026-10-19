@@ -12,7 +12,7 @@ export class FindMeetingsQueryDto extends PaginationQueryDto {
   @IsInt()
   @Min(1)
   @Transform(({ value }) => (value !== undefined ? Number(value) : undefined))
-  trabajadorId?: number;
+  workerId?: number;
 
   @IsOptional()
   @IsDateString()

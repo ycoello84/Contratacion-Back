@@ -23,21 +23,21 @@ export class Company {
     type: 'varchar',
     length: 64,
   })
-  identificacionFiscal: string;
+  taxId: string;
 
   @Index('idx_companies_razon_social')
   @Column({ name: 'razon_social', type: 'varchar', length: 200 })
-  razonSocial: string;
+  businessName: string;
 
   @Index('idx_companies_siglas')
   @Column({ name: 'siglas', type: 'varchar', length: 64, nullable: true })
-  siglas: string | null;
+  acronym: string | null;
 
   @Column({ name: 'direccion', type: 'varchar', length: 255, nullable: true })
-  direccion: string | null;
+  address: string | null;
 
   @Column({ name: 'telefono', type: 'varchar', length: 32, nullable: true })
-  telefono: string | null;
+  phone: string | null;
 
   @Column({
     name: 'email_contacto',
@@ -45,24 +45,24 @@ export class Company {
     length: 180,
     nullable: true,
   })
-  emailContacto: string | null;
+  contactEmail: string | null;
 
   @Index('idx_companies_es_ueb')
   @Column({ name: 'es_ueb', type: 'boolean', default: false })
-  esUeb: boolean;
+  isUeb: boolean;
 
   @Column({ name: 'parent_empresa_id', type: 'int', nullable: true })
-  parentEmpresaId: number | null;
+  parentCompanyId: number | null;
 
-  @ManyToOne(() => Company, (company) => company.uebs, {
+  @ManyToOne(() => Company, (company) => company.subsidiaries, {
     nullable: true,
     onDelete: 'SET NULL',
   })
   @JoinColumn({ name: 'parent_empresa_id' })
-  parentEmpresa: Relation<Company> | null;
+  parentCompany: Relation<Company> | null;
 
-  @OneToMany(() => Company, (company) => company.parentEmpresa)
-  uebs: Relation<Company>[];
+  @OneToMany(() => Company, (company) => company.parentCompany)
+  subsidiaries: Relation<Company>[];
 
   @CreateDateColumn()
   createdAt: Date;
@@ -70,9 +70,9 @@ export class Company {
   @UpdateDateColumn()
   updatedAt: Date;
 
-  @OneToMany(() => Contract, (contract) => contract.empresaOrigen)
-  contratosComoOrigen: Relation<Contract>[];
+  @OneToMany(() => Contract, (contract) => contract.originCompany)
+  contractsAsOrigin: Relation<Contract>[];
 
-  @OneToMany(() => Contract, (contract) => contract.empresaDestino)
-  contratosComoDestino: Relation<Contract>[];
+  @OneToMany(() => Contract, (contract) => contract.destinationCompany)
+  contractsAsDestination: Relation<Contract>[];
 }

@@ -15,43 +15,43 @@ export class UpdateAgreementDto {
   @IsString()
   @MaxLength(60)
   @Transform(({ value }) => (typeof value === 'string' ? value.trim() : value))
-  numeroAcuerdo?: string;
+  agreementNumber?: string;
 
   @IsOptional()
   @IsInt()
   @Min(1)
-  actaCcId?: number;
+  actCcId?: number;
 
   @IsOptional()
   @IsInt()
   @Min(1)
-  contratoId?: number | null;
+  contractId?: number | null;
 
   @IsOptional()
   @IsString()
   @MaxLength(120)
   @Transform(({ value }) => (typeof value === 'string' ? value.trim() : value))
-  punto?: string | null;
+  point?: string | null;
 
   @IsOptional()
   @IsString()
-  detalle?: string;
+  detail?: string;
 
   @IsOptional()
   @IsInt()
   @Min(1)
-  responsableId?: number;
+  responsibleId?: number;
 
   @IsOptional()
   @IsDateString(
     {},
     { message: 'La fecha límite de cumplimiento debe tener un formato válido.' },
   )
-  fechaCumplimiento?: string;
+  complianceDate?: string;
 
   @IsOptional()
   @IsEnum(AgreementStatus, {
     message: 'El estado de cumplimiento debe ser CUMPLIDO, NO_CUMPLIDO o PENDIENTE.',
   })
-  estadoCumplimiento?: AgreementStatus;
+  complianceStatus?: AgreementStatus;
 }

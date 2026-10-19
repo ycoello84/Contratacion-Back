@@ -21,14 +21,14 @@ export class Meeting {
 
   @Index('idx_meetings_numero_acta', { unique: true })
   @Column({ name: 'numero_acta', type: 'varchar', length: 80 })
-  numeroActa: string;
+  actNumber: string;
 
   @Index('idx_meetings_fecha_reunion')
   @Column({ name: 'fecha_reunion', type: 'datetime' })
-  fechaReunion: Date;
+  meetingDate: Date;
 
   @Column({ name: 'orden_del_dia', type: 'text' })
-  ordenDelDia: string;
+  agenda: string;
 
   @CreateDateColumn()
   createdAt: Date;
@@ -36,7 +36,7 @@ export class Meeting {
   @UpdateDateColumn()
   updatedAt: Date;
 
-  @ManyToMany(() => Worker, (worker) => worker.reuniones, {
+  @ManyToMany(() => Worker, (worker) => worker.meetings, {
     onDelete: 'CASCADE',
   })
   @JoinTable({
@@ -50,11 +50,11 @@ export class Meeting {
       referencedColumnName: 'id',
     },
   })
-  trabajadores: Relation<Worker>[];
+  workers: Relation<Worker>[];
 
-  @OneToMany(() => Contract, (contract) => contract.actaCc)
-  contratos: Relation<Contract>[];
+  @OneToMany(() => Contract, (contract) => contract.actCc)
+  contracts: Relation<Contract>[];
 
-  @OneToMany(() => Agreement, (agreement) => agreement.actaCc)
-  acuerdos: Relation<Agreement>[];
+  @OneToMany(() => Agreement, (agreement) => agreement.actCc)
+  agreements: Relation<Agreement>[];
 }

@@ -33,7 +33,7 @@ export class RolesGuard implements CanActivate {
       throw new ForbiddenException('No se pudo determinar el rol del usuario.');
     }
 
-    if (!requiredRoles.includes(user.rol)) {
+    if (!requiredRoles.includes(user.role)) {
       throw new ForbiddenException(
         `Acceso denegado. Se requiere uno de los roles: ${requiredRoles.join(', ')}.`,
       );

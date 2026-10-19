@@ -32,24 +32,26 @@ export class AgreementsService {
   ) {}
 
   async create(createAgreementDto: CreateAgreementDto): Promise<Agreement> {
-    await this.ensureNumeroAcuerdoIsAvailable(createAgreementDto.numeroAcuerdo);
-    await this.ensureActaExists(createAgreementDto.actaCcId);
-    await this.ensureResponsableExists(createAgreementDto.responsableId);
+    await this.ensureAgreementNumberIsAvailable(
+      createAgreementDto.agreementNumber,
+    );
+    await this.ensureActaExists(createAgreementDto.actCcId);
+    await this.ensureResponsableExists(createAgreementDto.responsibleId);
 
-    if (createAgreementDto.contratoId) {
-      await this.ensureContractExists(createAgreementDto.contratoId);
+    if (createAgreementDto.contractId) {
+      await this.ensureContractExists(createAgreementDto.contractId);
     }
 
     const agreement = this.repository.create({
-      numeroAcuerdo: createAgreementDto.numeroAcuerdo,
-      actaCcId: createAgreementDto.actaCcId,
-      contratoId: createAgreementDto.contratoId ?? null,
-      punto: createAgreementDto.punto ?? null,
-      detalle: createAgreementDto.detalle,
-      responsableId: createAgreementDto.responsableId,
-      fechaCumplimiento: createAgreementDto.fechaCumplimiento,
-      estadoCumplimiento:
-        createAgreementDto.estadoCumplimiento ?? AgreementStatus.PENDIENTE,
+      agreementNumber: createAgreementDto.agreementNumber,
+      actCcId: createAgreementDto.actCcId,
+      contractId: createAgreementDto.contractId ?? null,
+      point: createAgreementDto.point ?? null,
+      detail: createAgreementDto.detail,
+      responsibleId: createAgreementDto.responsibleId,
+      complianceDate: createAgreementDto.complianceDate,
+      complianceStatus:
+        createAgreementDto.complianceStatus ?? AgreementStatus.PENDIENTE,
     });
 
     const saved = await this.repository.save(agreement);
@@ -61,38 +63,38 @@ export class AgreementsService {
   ): Promise<PaginatedResult<Agreement>> {
     const qb = this.repository
       .createQueryBuilder('agreement')
-      .leftJoinAndSelect('agreement.actaCc', 'actaCc')
-      .leftJoinAndSelect('agreement.contrato', 'contrato')
-      .leftJoinAndSelect('agreement.responsable', 'responsable');
+      .leftJoinAndSelect('agreement.actCc', 'actCc')
+      .leftJoinAndSelect('agreement.contract', 'contract')
+      .leftJoinAndSelect('agreement.responsible', 'responsible');
 
     if (query.search) {
       qb.andWhere(
-        '(agreement.numeroAcuerdo LIKE :search OR agreement.detalle LIKE :search OR agreement.punto LIKE :search)',
+        '(agreement.agreementNumber LIKE :search OR agreement.detail LIKE :search OR agreement.point LIKE :search)',
         { search: `%${query.search}%` },
       );
     }
 
-    if (query.actaCcId) {
-      qb.andWhere('agreement.actaCcId = :actaCcId', {
-        actaCcId: query.actaCcId,
+    if (query.actCcId) {
+      qb.andWhere('agreement.actCcId = :actCcId', {
+        actCcId: query.actCcId,
       });
     }
 
-    if (query.contratoId) {
-      qb.andWhere('agreement.contratoId = :contratoId', {
-        contratoId: query.contratoId,
+    if (query.contractId) {
+      qb.andWhere('agreement.contractId = :contractId', {
+        contractId: query.contractId,
       });
     }
 
-    if (query.responsableId) {
-      qb.andWhere('agreement.responsableId = :responsableId', {
-        responsableId: query.responsableId,
+    if (query.responsibleId) {
+      qb.andWhere('agreement.responsibleId = :responsibleId', {
+        responsibleId: query.responsibleId,
       });
     }
 
-    if (query.estadoCumplimiento) {
-      qb.andWhere('agreement.estadoCumplimiento = :estado', {
-        estado: query.estadoCumplimiento,
+    if (query.complianceStatus) {
+      qb.andWhere('agreement.complianceStatus = :estado', {
+        estado: query.complianceStatus,
       });
     }
 
@@ -109,9 +111,9 @@ export class AgreementsService {
     const agreement = await this.repository.findOne({
       where: { id },
       relations: {
-        actaCc: true,
-        contrato: true,
-        responsable: true,
+        actCc: true,
+        contract: true,
+        responsible: true,
       },
     });
 
@@ -129,47 +131,47 @@ export class AgreementsService {
     const agreement = await this.findOne(id);
 
     if (
-      updateAgreementDto.numeroAcuerdo &&
-      updateAgreementDto.numeroAcuerdo !== agreement.numeroAcuerdo
+      updateAgreementDto.agreementNumber &&
+      updateAgreementDto.agreementNumber !== agreement.agreementNumber
     ) {
-      await this.ensureNumeroAcuerdoIsAvailable(
-        updateAgreementDto.numeroAcuerdo,
+      await this.ensureAgreementNumberIsAvailable(
+        updateAgreementDto.agreementNumber,
         id,
       );
-      agreement.numeroAcuerdo = updateAgreementDto.numeroAcuerdo;
+      agreement.agreementNumber = updateAgreementDto.agreementNumber;
     }
 
-    if (updateAgreementDto.actaCcId !== undefined) {
-      await this.ensureActaExists(updateAgreementDto.actaCcId);
-      agreement.actaCcId = updateAgreementDto.actaCcId;
+    if (updateAgreementDto.actCcId !== undefined) {
+      await this.ensureActaExists(updateAgreementDto.actCcId);
+      agreement.actCcId = updateAgreementDto.actCcId;
     }
 
-    if (updateAgreementDto.contratoId !== undefined) {
-      if (updateAgreementDto.contratoId !== null) {
-        await this.ensureContractExists(updateAgreementDto.contratoId);
+    if (updateAgreementDto.contractId !== undefined) {
+      if (updateAgreementDto.contractId !== null) {
+        await this.ensureContractExists(updateAgreementDto.contractId);
       }
-      agreement.contratoId = updateAgreementDto.contratoId;
+      agreement.contractId = updateAgreementDto.contractId;
     }
 
-    if (updateAgreementDto.responsableId !== undefined) {
-      await this.ensureResponsableExists(updateAgreementDto.responsableId);
-      agreement.responsableId = updateAgreementDto.responsableId;
+    if (updateAgreementDto.responsibleId !== undefined) {
+      await this.ensureResponsableExists(updateAgreementDto.responsibleId);
+      agreement.responsibleId = updateAgreementDto.responsibleId;
     }
 
-    if (updateAgreementDto.punto !== undefined) {
-      agreement.punto = updateAgreementDto.punto;
+    if (updateAgreementDto.point !== undefined) {
+      agreement.point = updateAgreementDto.point;
     }
 
-    if (updateAgreementDto.detalle !== undefined) {
-      agreement.detalle = updateAgreementDto.detalle;
+    if (updateAgreementDto.detail !== undefined) {
+      agreement.detail = updateAgreementDto.detail;
     }
 
-    if (updateAgreementDto.fechaCumplimiento !== undefined) {
-      agreement.fechaCumplimiento = updateAgreementDto.fechaCumplimiento;
+    if (updateAgreementDto.complianceDate !== undefined) {
+      agreement.complianceDate = updateAgreementDto.complianceDate;
     }
 
-    if (updateAgreementDto.estadoCumplimiento !== undefined) {
-      agreement.estadoCumplimiento = updateAgreementDto.estadoCumplimiento;
+    if (updateAgreementDto.complianceStatus !== undefined) {
+      agreement.complianceStatus = updateAgreementDto.complianceStatus;
     }
 
     await this.repository.save(agreement);
@@ -181,17 +183,17 @@ export class AgreementsService {
     await this.repository.remove(agreement);
   }
 
-  private async ensureNumeroAcuerdoIsAvailable(
-    numeroAcuerdo: string,
+  private async ensureAgreementNumberIsAvailable(
+    agreementNumber: string,
     ignoreId?: number,
   ): Promise<void> {
     const existing = await this.repository.findOne({
-      where: { numeroAcuerdo },
+      where: { agreementNumber },
     });
 
     if (existing && existing.id !== ignoreId) {
       throw new ConflictException(
-        `Ya existe un acuerdo con el número ${numeroAcuerdo}.`,
+        `Ya existe un acuerdo con el número ${agreementNumber}.`,
       );
     }
   }
@@ -203,12 +205,12 @@ export class AgreementsService {
     }
   }
 
-  private async ensureContractExists(contratoId: number): Promise<void> {
-    const contrato = await this.contractsRepository.findOne({
-      where: { id: contratoId },
+  private async ensureContractExists(contractId: number): Promise<void> {
+    const contract = await this.contractsRepository.findOne({
+      where: { id: contractId },
     });
-    if (!contrato) {
-      throw new NotFoundException(`Contrato con id ${contratoId} no encontrado.`);
+    if (!contract) {
+      throw new NotFoundException(`Contrato con id ${contractId} no encontrado.`);
     }
   }
 

@@ -29,7 +29,7 @@ export class AuthService {
       throw new UnauthorizedException('Credenciales inválidas.');
     }
 
-    if (!user.activo) {
+    if (!user.active) {
       throw new UnauthorizedException('El usuario se encuentra inactivo.');
     }
 
@@ -45,8 +45,8 @@ export class AuthService {
     const payload: JwtPayload = {
       sub: user.id,
       email: user.email,
-      nombre: user.nombre,
-      rol: user.rol,
+      name: user.name,
+      role: user.role,
     };
 
     const accessToken = await this.jwtService.signAsync(payload);
@@ -56,7 +56,7 @@ export class AuthService {
       accessToken,
       tokenType: 'Bearer',
       expiresIn,
-      user: this.toPayload(user.id, user.email, user.nombre, user.rol),
+      user: this.toPayload(user.id, user.email, user.name, user.role),
     };
   }
 
@@ -95,9 +95,9 @@ export class AuthService {
   toPayload(
     id: number,
     email: string,
-    nombre: string,
-    rol: AuthenticatedUser['rol'],
+    name: string,
+    role: AuthenticatedUser['role'],
   ): AuthUserPayload {
-    return { id, email, nombre, rol };
+    return { id, email, name, role };
   }
 }

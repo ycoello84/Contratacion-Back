@@ -32,43 +32,46 @@ export class ContractsService {
   ) {}
 
   async create(createContractDto: CreateContractDto): Promise<Contract> {
-    await this.ensureNoContratoIsAvailable(createContractDto.noContrato);
+    await this.ensureContractNumberIsAvailable(
+      createContractDto.contractNumber,
+    );
     await this.ensureCompaniesAreValid(
-      createContractDto.empresaOrigenId,
-      createContractDto.empresaDestinoId,
+      createContractDto.originCompanyId,
+      createContractDto.destinationCompanyId,
     );
     this.ensureDatesAreValid(
-      createContractDto.fechaInicio,
-      createContractDto.fechaVencimiento,
+      createContractDto.startDate,
+      createContractDto.expirationDate,
     );
 
     const tipo =
-      createContractDto.tipoRelacionContractual ?? ContractType.CONTRATO_PRINCIPAL;
+      createContractDto.contractRelationshipType ??
+      ContractType.CONTRATO_PRINCIPAL;
 
-    await this.ensureContratoPadreIsValid(tipo, createContractDto.contratoPadreId);
+    await this.ensureParentContractIsValid(tipo, createContractDto.parentContractId);
 
-    if (createContractDto.actaCcId) {
-      await this.ensureActaExists(createContractDto.actaCcId);
+    if (createContractDto.actCcId) {
+      await this.ensureActaExists(createContractDto.actCcId);
     }
 
     const contract = this.repository.create({
-      noContrato: createContractDto.noContrato,
-      tipoRelacionContractual: tipo,
-      contratoPadreId: createContractDto.contratoPadreId ?? null,
-      objeto: createContractDto.objeto,
-      empresaOrigenId: createContractDto.empresaOrigenId,
-      empresaDestinoId: createContractDto.empresaDestinoId,
-      areaEspecializada: createContractDto.areaEspecializada ?? null,
-      valor: createContractDto.valor ?? null,
-      sinValorRefiere: createContractDto.sinValorRefiere ?? false,
-      fechaEntradaUeb: createContractDto.fechaEntradaUeb ?? null,
-      fechaEmisionDictamen: createContractDto.fechaEmisionDictamen ?? null,
-      fechaInicio: createContractDto.fechaInicio,
-      fechaVencimiento: createContractDto.fechaVencimiento ?? null,
-      estadoAprobacionCc:
-        createContractDto.estadoAprobacionCc ??
+      contractNumber: createContractDto.contractNumber,
+      contractRelationshipType: tipo,
+      parentContractId: createContractDto.parentContractId ?? null,
+      object: createContractDto.object,
+      originCompanyId: createContractDto.originCompanyId,
+      destinationCompanyId: createContractDto.destinationCompanyId,
+      specializedArea: createContractDto.specializedArea ?? null,
+      value: createContractDto.value ?? null,
+      noValueReference: createContractDto.noValueReference ?? false,
+      uebEntryDate: createContractDto.uebEntryDate ?? null,
+      opinionIssueDate: createContractDto.opinionIssueDate ?? null,
+      startDate: createContractDto.startDate,
+      expirationDate: createContractDto.expirationDate ?? null,
+      ccApprovalStatus:
+        createContractDto.ccApprovalStatus ??
         ContractApprovalStatus.PENDIENTE_APROBACION_EMPRESA,
-      actaCcId: createContractDto.actaCcId ?? null,
+      actCcId: createContractDto.actCcId ?? null,
     });
 
     const saved = await this.repository.save(contract);
@@ -80,51 +83,51 @@ export class ContractsService {
   ): Promise<PaginatedResult<Contract>> {
     const qb = this.repository
       .createQueryBuilder('contract')
-      .leftJoinAndSelect('contract.empresaOrigen', 'empresaOrigen')
-      .leftJoinAndSelect('contract.empresaDestino', 'empresaDestino')
-      .leftJoinAndSelect('contract.contratoPadre', 'contratoPadre')
-      .leftJoinAndSelect('contract.actaCc', 'actaCc');
+      .leftJoinAndSelect('contract.originCompany', 'originCompany')
+      .leftJoinAndSelect('contract.destinationCompany', 'destinationCompany')
+      .leftJoinAndSelect('contract.parentContract', 'parentContract')
+      .leftJoinAndSelect('contract.actCc', 'actCc');
 
     if (query.search) {
       qb.andWhere(
-        '(contract.noContrato LIKE :search OR contract.objeto LIKE :search OR contract.areaEspecializada LIKE :search)',
+        '(contract.contractNumber LIKE :search OR contract.object LIKE :search OR contract.specializedArea LIKE :search)',
         { search: `%${query.search}%` },
       );
     }
 
-    if (query.tipoRelacionContractual) {
-      qb.andWhere('contract.tipoRelacionContractual = :tipo', {
-        tipo: query.tipoRelacionContractual,
+    if (query.contractRelationshipType) {
+      qb.andWhere('contract.contractRelationshipType = :tipo', {
+        tipo: query.contractRelationshipType,
       });
     }
 
-    if (query.contratoPadreId) {
-      qb.andWhere('contract.contratoPadreId = :contratoPadreId', {
-        contratoPadreId: query.contratoPadreId,
+    if (query.parentContractId) {
+      qb.andWhere('contract.parentContractId = :parentContractId', {
+        parentContractId: query.parentContractId,
       });
     }
 
-    if (query.estadoAprobacionCc) {
-      qb.andWhere('contract.estadoAprobacionCc = :estado', {
-        estado: query.estadoAprobacionCc,
+    if (query.ccApprovalStatus) {
+      qb.andWhere('contract.ccApprovalStatus = :estado', {
+        estado: query.ccApprovalStatus,
       });
     }
 
-    if (query.empresaOrigenId) {
-      qb.andWhere('contract.empresaOrigenId = :empresaOrigenId', {
-        empresaOrigenId: query.empresaOrigenId,
+    if (query.originCompanyId) {
+      qb.andWhere('contract.originCompanyId = :originCompanyId', {
+        originCompanyId: query.originCompanyId,
       });
     }
 
-    if (query.empresaDestinoId) {
-      qb.andWhere('contract.empresaDestinoId = :empresaDestinoId', {
-        empresaDestinoId: query.empresaDestinoId,
+    if (query.destinationCompanyId) {
+      qb.andWhere('contract.destinationCompanyId = :destinationCompanyId', {
+        destinationCompanyId: query.destinationCompanyId,
       });
     }
 
-    if (query.actaCcId) {
-      qb.andWhere('contract.actaCcId = :actaCcId', {
-        actaCcId: query.actaCcId,
+    if (query.actCcId) {
+      qb.andWhere('contract.actCcId = :actCcId', {
+        actCcId: query.actCcId,
       });
     }
 
@@ -141,11 +144,11 @@ export class ContractsService {
     const contract = await this.repository.findOne({
       where: { id },
       relations: {
-        empresaOrigen: true,
-        empresaDestino: true,
-        contratoPadre: true,
-        contratosHijos: true,
-        actaCc: true,
+        originCompany: true,
+        destinationCompany: true,
+        parentContract: true,
+        childContracts: true,
+        actCc: true,
       },
     });
 
@@ -163,93 +166,99 @@ export class ContractsService {
     const contract = await this.findOne(id);
 
     if (
-      updateContractDto.noContrato &&
-      updateContractDto.noContrato !== contract.noContrato
+      updateContractDto.contractNumber &&
+      updateContractDto.contractNumber !== contract.contractNumber
     ) {
-      await this.ensureNoContratoIsAvailable(updateContractDto.noContrato, id);
-      contract.noContrato = updateContractDto.noContrato;
+      await this.ensureContractNumberIsAvailable(
+        updateContractDto.contractNumber,
+        id,
+      );
+      contract.contractNumber = updateContractDto.contractNumber;
     }
 
     const origenId =
-      updateContractDto.empresaOrigenId ?? contract.empresaOrigenId;
+      updateContractDto.originCompanyId ?? contract.originCompanyId;
     const destinoId =
-      updateContractDto.empresaDestinoId ?? contract.empresaDestinoId;
+      updateContractDto.destinationCompanyId ?? contract.destinationCompanyId;
 
     if (
-      updateContractDto.empresaOrigenId !== undefined ||
-      updateContractDto.empresaDestinoId !== undefined
+      updateContractDto.originCompanyId !== undefined ||
+      updateContractDto.destinationCompanyId !== undefined
     ) {
       await this.ensureCompaniesAreValid(origenId, destinoId);
-      contract.empresaOrigenId = origenId;
-      contract.empresaDestinoId = destinoId;
+      contract.originCompanyId = origenId;
+      contract.destinationCompanyId = destinoId;
     }
 
-    const fechaInicio = updateContractDto.fechaInicio ?? contract.fechaInicio;
-    const fechaVencimiento =
-      updateContractDto.fechaVencimiento !== undefined
-        ? updateContractDto.fechaVencimiento
-        : contract.fechaVencimiento;
-    this.ensureDatesAreValid(fechaInicio, fechaVencimiento);
+    const startDate = updateContractDto.startDate ?? contract.startDate;
+    const expirationDate =
+      updateContractDto.expirationDate !== undefined
+        ? updateContractDto.expirationDate
+        : contract.expirationDate;
+    this.ensureDatesAreValid(startDate, expirationDate);
 
-    if (updateContractDto.fechaInicio !== undefined) {
-      contract.fechaInicio = updateContractDto.fechaInicio;
+    if (updateContractDto.startDate !== undefined) {
+      contract.startDate = updateContractDto.startDate;
     }
-    if (updateContractDto.fechaVencimiento !== undefined) {
-      contract.fechaVencimiento = updateContractDto.fechaVencimiento;
+    if (updateContractDto.expirationDate !== undefined) {
+      contract.expirationDate = updateContractDto.expirationDate;
     }
 
     const tipo =
-      updateContractDto.tipoRelacionContractual ?? contract.tipoRelacionContractual;
+      updateContractDto.contractRelationshipType ??
+      contract.contractRelationshipType;
     const padreId =
-      updateContractDto.contratoPadreId !== undefined
-        ? updateContractDto.contratoPadreId
-        : contract.contratoPadreId;
+      updateContractDto.parentContractId !== undefined
+        ? updateContractDto.parentContractId
+        : contract.parentContractId;
 
     if (
-      updateContractDto.tipoRelacionContractual !== undefined ||
-      updateContractDto.contratoPadreId !== undefined
+      updateContractDto.contractRelationshipType !== undefined ||
+      updateContractDto.parentContractId !== undefined
     ) {
       if (padreId === id) {
-        throw new BadRequestException('Un contrato no puede ser su propio contrato padre.');
+        throw new BadRequestException(
+          'Un contrato no puede ser su propio contrato padre.',
+        );
       }
-      await this.ensureContratoPadreIsValid(tipo, padreId ?? undefined);
-      contract.tipoRelacionContractual = tipo;
-      contract.contratoPadreId = padreId;
+      await this.ensureParentContractIsValid(tipo, padreId ?? undefined);
+      contract.contractRelationshipType = tipo;
+      contract.parentContractId = padreId;
     }
 
-    if (updateContractDto.actaCcId !== undefined) {
-      if (updateContractDto.actaCcId !== null) {
-        await this.ensureActaExists(updateContractDto.actaCcId);
+    if (updateContractDto.actCcId !== undefined) {
+      if (updateContractDto.actCcId !== null) {
+        await this.ensureActaExists(updateContractDto.actCcId);
       }
-      contract.actaCcId = updateContractDto.actaCcId;
+      contract.actCcId = updateContractDto.actCcId;
     }
 
-    if (updateContractDto.objeto !== undefined) {
-      contract.objeto = updateContractDto.objeto;
+    if (updateContractDto.object !== undefined) {
+      contract.object = updateContractDto.object;
     }
 
-    if (updateContractDto.areaEspecializada !== undefined) {
-      contract.areaEspecializada = updateContractDto.areaEspecializada;
+    if (updateContractDto.specializedArea !== undefined) {
+      contract.specializedArea = updateContractDto.specializedArea;
     }
 
-    if (updateContractDto.valor !== undefined) {
-      contract.valor = updateContractDto.valor;
+    if (updateContractDto.value !== undefined) {
+      contract.value = updateContractDto.value;
     }
 
-    if (updateContractDto.sinValorRefiere !== undefined) {
-      contract.sinValorRefiere = updateContractDto.sinValorRefiere;
+    if (updateContractDto.noValueReference !== undefined) {
+      contract.noValueReference = updateContractDto.noValueReference;
     }
 
-    if (updateContractDto.fechaEntradaUeb !== undefined) {
-      contract.fechaEntradaUeb = updateContractDto.fechaEntradaUeb;
+    if (updateContractDto.uebEntryDate !== undefined) {
+      contract.uebEntryDate = updateContractDto.uebEntryDate;
     }
 
-    if (updateContractDto.fechaEmisionDictamen !== undefined) {
-      contract.fechaEmisionDictamen = updateContractDto.fechaEmisionDictamen;
+    if (updateContractDto.opinionIssueDate !== undefined) {
+      contract.opinionIssueDate = updateContractDto.opinionIssueDate;
     }
 
-    if (updateContractDto.estadoAprobacionCc !== undefined) {
-      contract.estadoAprobacionCc = updateContractDto.estadoAprobacionCc;
+    if (updateContractDto.ccApprovalStatus !== undefined) {
+      contract.ccApprovalStatus = updateContractDto.ccApprovalStatus;
     }
 
     await this.repository.save(contract);
@@ -261,7 +270,7 @@ export class ContractsService {
     dto: ChangeContractStatusDto,
   ): Promise<Contract> {
     const contract = await this.findOne(id);
-    contract.estadoAprobacionCc = dto.estadoAprobacionCc;
+    contract.ccApprovalStatus = dto.ccApprovalStatus;
     await this.repository.save(contract);
     return this.findOne(id);
   }
@@ -270,7 +279,7 @@ export class ContractsService {
     const contract = await this.findOne(id);
 
     const childrenCount = await this.repository.count({
-      where: { contratoPadreId: id },
+      where: { parentContractId: id },
     });
 
     if (childrenCount > 0) {
@@ -282,17 +291,17 @@ export class ContractsService {
     await this.repository.remove(contract);
   }
 
-  private async ensureNoContratoIsAvailable(
-    noContrato: string,
+  private async ensureContractNumberIsAvailable(
+    contractNumber: string,
     ignoreId?: number,
   ): Promise<void> {
     const existing = await this.repository.findOne({
-      where: { noContrato },
+      where: { contractNumber },
     });
 
     if (existing && existing.id !== ignoreId) {
       throw new ConflictException(
-        `Ya existe un contrato con el código o número ${noContrato}.`,
+        `Ya existe un contrato con el código o número ${contractNumber}.`,
       );
     }
   }
@@ -325,7 +334,7 @@ export class ContractsService {
     }
   }
 
-  private async ensureContratoPadreIsValid(
+  private async ensureParentContractIsValid(
     tipo: ContractType,
     padreId?: number | null,
   ): Promise<void> {
@@ -352,13 +361,13 @@ export class ContractsService {
   }
 
   private ensureDatesAreValid(
-    fechaInicio: string,
-    fechaVencimiento?: string | null,
+    startDate: string,
+    expirationDate?: string | null,
   ): void {
-    if (!fechaVencimiento) return;
+    if (!expirationDate) return;
 
-    const start = new Date(fechaInicio);
-    const end = new Date(fechaVencimiento);
+    const start = new Date(startDate);
+    const end = new Date(expirationDate);
 
     if (end < start) {
       throw new BadRequestException(

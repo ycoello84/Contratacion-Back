@@ -5,5 +5,5 @@ export class ChangeContractStatusDto {
   @IsEnum(ContractApprovalStatus, {
     message: 'El estado de aprobación del CC no es válido.',
   })
-  estadoAprobacionCc: ContractApprovalStatus;
+  ccApprovalStatus: ContractApprovalStatus;
 }

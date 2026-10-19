@@ -10,9 +10,9 @@ export class FindUsersQueryDto extends PaginationQueryDto {
 
   @IsOptional()
   @IsEnum(UserRole)
-  rol?: UserRole;
+  role?: UserRole;
 
   @IsOptional()
   @IsBoolean()
-  activo?: boolean;
+  active?: boolean;
 }

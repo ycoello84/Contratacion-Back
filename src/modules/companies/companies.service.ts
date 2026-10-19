@@ -24,23 +24,21 @@ export class CompaniesService {
   ) {}
 
   async create(createCompanyDto: CreateCompanyDto): Promise<Company> {
-    await this.ensureIdentificacionIsAvailable(
-      createCompanyDto.identificacionFiscal,
-    );
+    await this.ensureTaxIdIsAvailable(createCompanyDto.taxId);
 
-    if (createCompanyDto.parentEmpresaId) {
-      await this.ensureParentExists(createCompanyDto.parentEmpresaId);
+    if (createCompanyDto.parentCompanyId) {
+      await this.ensureParentExists(createCompanyDto.parentCompanyId);
     }
 
     const company = this.repository.create({
-      razonSocial: createCompanyDto.razonSocial,
-      identificacionFiscal: createCompanyDto.identificacionFiscal,
-      siglas: createCompanyDto.siglas ?? null,
-      direccion: createCompanyDto.direccion ?? null,
-      telefono: createCompanyDto.telefono ?? null,
-      emailContacto: createCompanyDto.emailContacto ?? null,
-      esUeb: createCompanyDto.esUeb ?? (createCompanyDto.parentEmpresaId ? true : false),
-      parentEmpresaId: createCompanyDto.parentEmpresaId ?? null,
+      businessName: createCompanyDto.businessName,
+      taxId: createCompanyDto.taxId,
+      acronym: createCompanyDto.acronym ?? null,
+      address: createCompanyDto.address ?? null,
+      phone: createCompanyDto.phone ?? null,
+      contactEmail: createCompanyDto.contactEmail ?? null,
+      isUeb: createCompanyDto.isUeb ?? (createCompanyDto.parentCompanyId ? true : false),
+      parentCompanyId: createCompanyDto.parentCompanyId ?? null,
     });
 
     const saved = await this.repository.save(company);
@@ -52,22 +50,22 @@ export class CompaniesService {
   ): Promise<PaginatedResult<Company>> {
     const qb = this.repository
       .createQueryBuilder('company')
-      .leftJoinAndSelect('company.parentEmpresa', 'parentEmpresa');
+      .leftJoinAndSelect('company.parentCompany', 'parentCompany');
 
     if (query.search) {
       qb.andWhere(
-        '(company.razonSocial LIKE :search OR company.identificacionFiscal LIKE :search OR company.siglas LIKE :search)',
+        '(company.businessName LIKE :search OR company.taxId LIKE :search OR company.acronym LIKE :search)',
         { search: `%${query.search}%` },
       );
     }
 
-    if (query.esUeb !== undefined) {
-      qb.andWhere('company.esUeb = :esUeb', { esUeb: query.esUeb });
+    if (query.isUeb !== undefined) {
+      qb.andWhere('company.isUeb = :isUeb', { isUeb: query.isUeb });
     }
 
-    if (query.parentEmpresaId !== undefined) {
-      qb.andWhere('company.parentEmpresaId = :parentEmpresaId', {
-        parentEmpresaId: query.parentEmpresaId,
+    if (query.parentCompanyId !== undefined) {
+      qb.andWhere('company.parentCompanyId = :parentCompanyId', {
+        parentCompanyId: query.parentCompanyId,
       });
     }
 
@@ -84,8 +82,8 @@ export class CompaniesService {
     const company = await this.repository.findOne({
       where: { id },
       relations: {
-        parentEmpresa: true,
-        uebs: true,
+        parentCompany: true,
+        subsidiaries: true,
       },
     });
 
@@ -100,48 +98,45 @@ export class CompaniesService {
     const company = await this.findOne(id);
 
     if (
-      updateCompanyDto.identificacionFiscal &&
-      updateCompanyDto.identificacionFiscal !== company.identificacionFiscal
+      updateCompanyDto.taxId &&
+      updateCompanyDto.taxId !== company.taxId
     ) {
-      await this.ensureIdentificacionIsAvailable(
-        updateCompanyDto.identificacionFiscal,
-        id,
-      );
-      company.identificacionFiscal = updateCompanyDto.identificacionFiscal;
+      await this.ensureTaxIdIsAvailable(updateCompanyDto.taxId, id);
+      company.taxId = updateCompanyDto.taxId;
     }
 
-    if (updateCompanyDto.razonSocial !== undefined) {
-      company.razonSocial = updateCompanyDto.razonSocial;
+    if (updateCompanyDto.businessName !== undefined) {
+      company.businessName = updateCompanyDto.businessName;
     }
 
-    if (updateCompanyDto.siglas !== undefined) {
-      company.siglas = updateCompanyDto.siglas ?? null;
+    if (updateCompanyDto.acronym !== undefined) {
+      company.acronym = updateCompanyDto.acronym ?? null;
     }
 
-    if (updateCompanyDto.direccion !== undefined) {
-      company.direccion = updateCompanyDto.direccion;
+    if (updateCompanyDto.address !== undefined) {
+      company.address = updateCompanyDto.address;
     }
 
-    if (updateCompanyDto.telefono !== undefined) {
-      company.telefono = updateCompanyDto.telefono;
+    if (updateCompanyDto.phone !== undefined) {
+      company.phone = updateCompanyDto.phone;
     }
 
-    if (updateCompanyDto.emailContacto !== undefined) {
-      company.emailContacto = updateCompanyDto.emailContacto;
+    if (updateCompanyDto.contactEmail !== undefined) {
+      company.contactEmail = updateCompanyDto.contactEmail;
     }
 
-    if (updateCompanyDto.esUeb !== undefined) {
-      company.esUeb = updateCompanyDto.esUeb;
+    if (updateCompanyDto.isUeb !== undefined) {
+      company.isUeb = updateCompanyDto.isUeb;
     }
 
-    if (updateCompanyDto.parentEmpresaId !== undefined) {
-      if (updateCompanyDto.parentEmpresaId === id) {
+    if (updateCompanyDto.parentCompanyId !== undefined) {
+      if (updateCompanyDto.parentCompanyId === id) {
         throw new ConflictException('Una empresa no puede ser su propia empresa matriz.');
       }
-      if (updateCompanyDto.parentEmpresaId !== null) {
-        await this.ensureParentExists(updateCompanyDto.parentEmpresaId);
+      if (updateCompanyDto.parentCompanyId !== null) {
+        await this.ensureParentExists(updateCompanyDto.parentCompanyId);
       }
-      company.parentEmpresaId = updateCompanyDto.parentEmpresaId;
+      company.parentCompanyId = updateCompanyDto.parentCompanyId;
     }
 
     await this.repository.save(company);
@@ -151,17 +146,17 @@ export class CompaniesService {
   async remove(id: number): Promise<void> {
     const company = await this.findOne(id);
 
-    const uebsCount = await this.repository.count({
-      where: { parentEmpresaId: id },
+    const subsidiariesCount = await this.repository.count({
+      where: { parentCompanyId: id },
     });
-    if (uebsCount > 0) {
+    if (subsidiariesCount > 0) {
       throw new ConflictException(
-        `No se puede eliminar la empresa porque tiene ${uebsCount} UEB(s) asociada(s).`,
+        `No se puede eliminar la empresa porque tiene ${subsidiariesCount} UEB(s) asociada(s).`,
       );
     }
 
     const contracts = await this.dataSource.getRepository(Contract).count({
-      where: [{ empresaOrigenId: id }, { empresaDestinoId: id }],
+      where: [{ originCompanyId: id }, { destinationCompanyId: id }],
     });
 
     if (contracts > 0) {
@@ -180,17 +175,17 @@ export class CompaniesService {
     }
   }
 
-  private async ensureIdentificacionIsAvailable(
-    identificacionFiscal: string,
+  private async ensureTaxIdIsAvailable(
+    taxId: string,
     ignoreId?: number,
   ): Promise<void> {
     const existing = await this.repository.findOne({
-      where: { identificacionFiscal },
+      where: { taxId },
     });
 
     if (existing && existing.id !== ignoreId) {
       throw new ConflictException(
-        `Ya existe una empresa con la identificación fiscal ${identificacionFiscal}.`,
+        `Ya existe una empresa con la identificación fiscal ${taxId}.`,
       );
     }
   }

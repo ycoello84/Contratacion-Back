@@ -22,7 +22,7 @@ export class Contract {
 
   @Index('idx_contracts_no_contrato', { unique: true })
   @Column({ name: 'no_contrato', type: 'varchar', length: 60 })
-  noContrato: string;
+  contractNumber: string;
 
   @Index('idx_contracts_tipo_relacion')
   @Column({
@@ -31,41 +31,41 @@ export class Contract {
     enum: ContractType,
     default: ContractType.CONTRATO_PRINCIPAL,
   })
-  tipoRelacionContractual: ContractType;
+  contractRelationshipType: ContractType;
 
   @Column({ name: 'contrato_padre_id', type: 'int', nullable: true })
-  contratoPadreId: number | null;
+  parentContractId: number | null;
 
-  @ManyToOne(() => Contract, (contract) => contract.contratosHijos, {
+  @ManyToOne(() => Contract, (contract) => contract.childContracts, {
     nullable: true,
     onDelete: 'RESTRICT',
   })
   @JoinColumn({ name: 'contrato_padre_id' })
-  contratoPadre: Relation<Contract> | null;
+  parentContract: Relation<Contract> | null;
 
-  @OneToMany(() => Contract, (contract) => contract.contratoPadre)
-  contratosHijos: Relation<Contract>[];
+  @OneToMany(() => Contract, (contract) => contract.parentContract)
+  childContracts: Relation<Contract>[];
 
   @Column({ type: 'text' })
-  objeto: string;
+  object: string;
 
   @Column({ name: 'empresa_origen_id', type: 'int' })
-  empresaOrigenId: number;
+  originCompanyId: number;
 
-  @ManyToOne(() => Company, (company) => company.contratosComoOrigen, {
+  @ManyToOne(() => Company, (company) => company.contractsAsOrigin, {
     onDelete: 'RESTRICT',
   })
   @JoinColumn({ name: 'empresa_origen_id' })
-  empresaOrigen: Relation<Company>;
+  originCompany: Relation<Company>;
 
   @Column({ name: 'empresa_destino_id', type: 'int' })
-  empresaDestinoId: number;
+  destinationCompanyId: number;
 
-  @ManyToOne(() => Company, (company) => company.contratosComoDestino, {
+  @ManyToOne(() => Company, (company) => company.contractsAsDestination, {
     onDelete: 'RESTRICT',
   })
   @JoinColumn({ name: 'empresa_destino_id' })
-  empresaDestino: Relation<Company>;
+  destinationCompany: Relation<Company>;
 
   @Column({
     name: 'area_especializada',
@@ -73,7 +73,7 @@ export class Contract {
     length: 120,
     nullable: true,
   })
-  areaEspecializada: string | null;
+  specializedArea: string | null;
 
   @Column({
     type: 'decimal',
@@ -81,22 +81,22 @@ export class Contract {
     scale: 2,
     nullable: true,
   })
-  valor: string | null;
+  value: string | null;
 
   @Column({ name: 'sin_valor_refiere', type: 'boolean', default: false })
-  sinValorRefiere: boolean;
+  noValueReference: boolean;
 
   @Column({ name: 'fecha_entrada_ueb', type: 'date', nullable: true })
-  fechaEntradaUeb: string | null;
+  uebEntryDate: string | null;
 
   @Column({ name: 'fecha_emision_dictamen', type: 'date', nullable: true })
-  fechaEmisionDictamen: string | null;
+  opinionIssueDate: string | null;
 
   @Column({ name: 'fecha_inicio', type: 'date' })
-  fechaInicio: string;
+  startDate: string;
 
   @Column({ name: 'fecha_vencimiento', type: 'date', nullable: true })
-  fechaVencimiento: string | null;
+  expirationDate: string | null;
 
   @Index('idx_contracts_estado_aprobacion_cc')
   @Column({
@@ -105,17 +105,17 @@ export class Contract {
     enum: ContractApprovalStatus,
     default: ContractApprovalStatus.PENDIENTE_APROBACION_EMPRESA,
   })
-  estadoAprobacionCc: ContractApprovalStatus;
+  ccApprovalStatus: ContractApprovalStatus;
 
   @Column({ name: 'acta_cc_id', type: 'int', nullable: true })
-  actaCcId: number | null;
+  actCcId: number | null;
 
-  @ManyToOne(() => Meeting, (meeting) => meeting.contratos, {
+  @ManyToOne(() => Meeting, (meeting) => meeting.contracts, {
     nullable: true,
     onDelete: 'SET NULL',
   })
   @JoinColumn({ name: 'acta_cc_id' })
-  actaCc: Relation<Meeting> | null;
+  actCc: Relation<Meeting> | null;
 
   @CreateDateColumn()
   createdAt: Date;

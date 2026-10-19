@@ -12,7 +12,7 @@ export class FindWorkersQueryDto extends PaginationQueryDto {
   @IsInt()
   @Min(1)
   @Transform(({ value }) => (value !== undefined ? Number(value) : undefined))
-  empresaId?: number;
+  companyId?: number;
 
   @IsOptional()
   @IsBoolean()
@@ -21,6 +21,5 @@ export class FindWorkersQueryDto extends PaginationQueryDto {
     if (value === 'false' || value === false) return false;
     return value;
   })
-  esMiembroCc?: boolean;
+  isCcMember?: boolean;
 }
-

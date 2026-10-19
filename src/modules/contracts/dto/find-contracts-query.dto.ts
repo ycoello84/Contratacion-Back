@@ -12,33 +12,33 @@ export class FindContractsQueryDto extends PaginationQueryDto {
 
   @IsOptional()
   @IsEnum(ContractType)
-  tipoRelacionContractual?: ContractType;
+  contractRelationshipType?: ContractType;
 
   @IsOptional()
   @IsInt()
   @Min(1)
   @Transform(({ value }) => (value !== undefined ? Number(value) : undefined))
-  contratoPadreId?: number;
+  parentContractId?: number;
 
   @IsOptional()
   @IsEnum(ContractApprovalStatus)
-  estadoAprobacionCc?: ContractApprovalStatus;
+  ccApprovalStatus?: ContractApprovalStatus;
 
   @IsOptional()
   @IsInt()
   @Min(1)
   @Transform(({ value }) => (value !== undefined ? Number(value) : undefined))
-  empresaOrigenId?: number;
+  originCompanyId?: number;
 
   @IsOptional()
   @IsInt()
   @Min(1)
   @Transform(({ value }) => (value !== undefined ? Number(value) : undefined))
-  empresaDestinoId?: number;
+  destinationCompanyId?: number;
 
   @IsOptional()
   @IsInt()
   @Min(1)
   @Transform(({ value }) => (value !== undefined ? Number(value) : undefined))
-  actaCcId?: number;
+  actCcId?: number;
 }

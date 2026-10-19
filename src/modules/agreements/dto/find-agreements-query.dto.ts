@@ -13,21 +13,21 @@ export class FindAgreementsQueryDto extends PaginationQueryDto {
   @IsInt()
   @Min(1)
   @Transform(({ value }) => (value !== undefined ? Number(value) : undefined))
-  actaCcId?: number;
+  actCcId?: number;
 
   @IsOptional()
   @IsInt()
   @Min(1)
   @Transform(({ value }) => (value !== undefined ? Number(value) : undefined))
-  contratoId?: number;
+  contractId?: number;
 
   @IsOptional()
   @IsInt()
   @Min(1)
   @Transform(({ value }) => (value !== undefined ? Number(value) : undefined))
-  responsableId?: number;
+  responsibleId?: number;
 
   @IsOptional()
   @IsEnum(AgreementStatus)
-  estadoCumplimiento?: AgreementStatus;
+  complianceStatus?: AgreementStatus;
 }

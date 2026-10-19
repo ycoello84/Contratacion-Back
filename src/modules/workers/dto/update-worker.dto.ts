@@ -14,12 +14,12 @@ export class UpdateWorkerDto {
   @IsString()
   @MaxLength(160)
   @Transform(({ value }) => (typeof value === 'string' ? value.trim() : value))
-  nombreCompleto?: string;
+  fullName?: string;
 
   @IsOptional()
   @IsString()
   @MaxLength(120)
-  cargo?: string;
+  position?: string;
 
   @IsOptional()
   @IsEmail({}, { message: 'El email debe tener un formato válido.' })
@@ -29,15 +29,15 @@ export class UpdateWorkerDto {
   @IsOptional()
   @IsInt()
   @Min(1)
-  empresaId?: number | null;
+  companyId?: number | null;
 
   @IsOptional()
   @IsBoolean()
-  esMiembroCc?: boolean;
+  isCcMember?: boolean;
 
   @IsOptional()
   @IsString()
   @MaxLength(100)
   @Transform(({ value }) => (typeof value === 'string' ? value.trim() : value))
-  cargoCc?: string | null;
+  ccPosition?: string | null;
 }

@@ -23,8 +23,8 @@ export class AuthController {
     return {
       id: user.id,
       email: user.email,
-      nombre: user.nombre,
-      rol: user.rol,
+      name: user.name,
+      role: user.role,
     };
   }
 

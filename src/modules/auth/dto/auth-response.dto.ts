@@ -3,8 +3,8 @@ import { UserRole } from '../../users/entities/user-role.enum.js';
 export interface AuthUserPayload {
   id: number;
   email: string;
-  nombre: string;
-  rol: UserRole;
+  name: string;
+  role: UserRole;
 }
 
 export interface AuthResponse {

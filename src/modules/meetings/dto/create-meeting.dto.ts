@@ -16,22 +16,22 @@ export class CreateMeetingDto {
   @IsNotEmpty()
   @MaxLength(80)
   @Transform(({ value }) => (typeof value === 'string' ? value.trim() : value))
-  numeroActa: string;
+  actNumber: string;
 
   @IsDateString(
     {},
     { message: 'La fecha de la reunión debe tener un formato válido.' },
   )
-  fechaReunion: string;
+  meetingDate: string;
 
   @IsString()
   @IsNotEmpty()
-  ordenDelDia: string;
+  agenda: string;
 
   @IsOptional()
   @IsArray()
   @ArrayMaxSize(200)
   @IsInt({ each: true })
   @Min(1, { each: true })
-  trabajadorIds?: number[];
+  workerIds?: number[];
 }

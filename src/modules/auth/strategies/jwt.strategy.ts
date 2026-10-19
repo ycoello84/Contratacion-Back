@@ -9,8 +9,8 @@ import { UsersService } from '../../users/users.service.js';
 export interface JwtPayload {
   sub: number;
   email: string;
-  nombre: string;
-  rol: UserRole;
+  name: string;
+  role: UserRole;
   iat?: number;
   exp?: number;
 }
@@ -31,7 +31,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
   async validate(payload: JwtPayload): Promise<AuthenticatedUser> {
     const user = await this.usersService.findEntityById(payload.sub);
 
-    if (!user || !user.activo) {
+    if (!user || !user.active) {
       throw new UnauthorizedException(
         'El usuario no existe o se encuentra inactivo.',
       );
@@ -40,8 +40,8 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     return {
       id: user.id,
       email: user.email,
-      nombre: user.nombre,
-      rol: user.rol,
+      name: user.name,
+      role: user.role,
     };
   }
 }

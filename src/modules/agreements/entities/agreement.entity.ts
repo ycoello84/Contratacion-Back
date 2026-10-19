@@ -21,39 +21,39 @@ export class Agreement {
 
   @Index('idx_agreements_numero_acuerdo', { unique: true })
   @Column({ name: 'numero_acuerdo', type: 'varchar', length: 60 })
-  numeroAcuerdo: string;
+  agreementNumber: string;
 
   @Column({ name: 'acta_cc_id', type: 'int' })
-  actaCcId: number;
+  actCcId: number;
 
-  @ManyToOne(() => Meeting, (meeting) => meeting.acuerdos, {
+  @ManyToOne(() => Meeting, (meeting) => meeting.agreements, {
     onDelete: 'CASCADE',
   })
   @JoinColumn({ name: 'acta_cc_id' })
-  actaCc: Relation<Meeting>;
+  actCc: Relation<Meeting>;
 
   @Column({ name: 'contrato_id', type: 'int', nullable: true })
-  contratoId: number | null;
+  contractId: number | null;
 
   @ManyToOne(() => Contract, { nullable: true, onDelete: 'SET NULL' })
   @JoinColumn({ name: 'contrato_id' })
-  contrato: Relation<Contract> | null;
+  contract: Relation<Contract> | null;
 
   @Column({ type: 'varchar', length: 120, nullable: true })
-  punto: string | null;
+  point: string | null;
 
   @Column({ type: 'text' })
-  detalle: string;
+  detail: string;
 
   @Column({ name: 'responsable_id', type: 'int' })
-  responsableId: number;
+  responsibleId: number;
 
   @ManyToOne(() => Worker, { onDelete: 'RESTRICT' })
   @JoinColumn({ name: 'responsable_id' })
-  responsable: Relation<Worker>;
+  responsible: Relation<Worker>;
 
   @Column({ name: 'fecha_cumplimiento', type: 'date' })
-  fechaCumplimiento: string;
+  complianceDate: string;
 
   @Index('idx_agreements_estado_cumplimiento')
   @Column({
@@ -62,7 +62,7 @@ export class Agreement {
     enum: AgreementStatus,
     default: AgreementStatus.PENDIENTE,
   })
-  estadoCumplimiento: AgreementStatus;
+  complianceStatus: AgreementStatus;
 
   @CreateDateColumn()
   createdAt: Date;

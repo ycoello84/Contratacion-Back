@@ -36,9 +36,9 @@ export class UsersService {
 
     const user = this.repository.create({
       email: dto.email,
-      nombre: dto.nombre,
-      rol: dto.rol ?? UserRole.LECTOR,
-      activo: dto.activo ?? true,
+      name: dto.name,
+      role: dto.role ?? UserRole.LECTOR,
+      active: dto.active ?? true,
       passwordHash: await bcrypt.hash(dto.password, SALT_ROUNDS),
     });
 
@@ -49,16 +49,16 @@ export class UsersService {
   async findAll(query: FindUsersQueryDto): Promise<PaginatedResult<SafeUser>> {
     const qb = this.repository.createQueryBuilder('user');
 
-    if (query.rol) {
-      qb.andWhere('user.rol = :rol', { rol: query.rol });
+    if (query.role) {
+      qb.andWhere('user.role = :role', { role: query.role });
     }
 
-    if (query.activo !== undefined) {
-      qb.andWhere('user.activo = :activo', { activo: query.activo });
+    if (query.active !== undefined) {
+      qb.andWhere('user.active = :active', { active: query.active });
     }
 
     if (query.search) {
-      qb.andWhere('(user.nombre LIKE :search OR user.email LIKE :search)', {
+      qb.andWhere('(user.name LIKE :search OR user.email LIKE :search)', {
         search: `%${query.search}%`,
       });
     }
@@ -119,16 +119,16 @@ export class UsersService {
       user.email = dto.email;
     }
 
-    if (dto.nombre !== undefined) {
-      user.nombre = dto.nombre;
+    if (dto.name !== undefined) {
+      user.name = dto.name;
     }
 
-    if (dto.rol !== undefined) {
-      user.rol = dto.rol;
+    if (dto.role !== undefined) {
+      user.role = dto.role;
     }
 
-    if (dto.activo !== undefined) {
-      user.activo = dto.activo;
+    if (dto.active !== undefined) {
+      user.active = dto.active;
     }
 
     if (dto.password !== undefined) {
@@ -149,7 +149,7 @@ export class UsersService {
       throw new NotFoundException(`Usuario con id ${id} no encontrado.`);
     }
 
-    user.activo = false;
+    user.active = false;
     const saved = await this.repository.save(user);
     return this.toSafeUser(saved);
   }

@@ -25,13 +25,13 @@ export class MeetingsService {
   ) {}
 
   async create(createMeetingDto: CreateMeetingDto): Promise<Meeting> {
-    await this.ensureNumeroActaIsAvailable(createMeetingDto.numeroActa);
-    const workers = await this.loadWorkers(createMeetingDto.trabajadorIds);
+    await this.ensureActNumberIsAvailable(createMeetingDto.actNumber);
+    const workers = await this.loadWorkers(createMeetingDto.workerIds);
 
     const meeting = this.repository.create({
-      numeroActa: createMeetingDto.numeroActa,
-      fechaReunion: new Date(createMeetingDto.fechaReunion),
-      ordenDelDia: createMeetingDto.ordenDelDia,
+      actNumber: createMeetingDto.actNumber,
+      meetingDate: new Date(createMeetingDto.meetingDate),
+      agenda: createMeetingDto.agenda,
     });
 
     const saved = await this.repository.save(meeting);
@@ -48,37 +48,37 @@ export class MeetingsService {
   ): Promise<PaginatedResult<Meeting>> {
     const qb = this.repository
       .createQueryBuilder('meeting')
-      .leftJoinAndSelect('meeting.trabajadores', 'trabajador')
-      .leftJoinAndSelect('meeting.contratos', 'contrato')
-      .leftJoinAndSelect('meeting.acuerdos', 'acuerdo');
+      .leftJoinAndSelect('meeting.workers', 'worker')
+      .leftJoinAndSelect('meeting.contracts', 'contract')
+      .leftJoinAndSelect('meeting.agreements', 'agreement');
 
     if (query.search) {
       qb.andWhere(
-        '(meeting.numeroActa LIKE :search OR meeting.ordenDelDia LIKE :search)',
+        '(meeting.actNumber LIKE :search OR meeting.agenda LIKE :search)',
         { search: `%${query.search}%` },
       );
     }
 
-    if (query.trabajadorId) {
-      qb.andWhere('trabajador.id = :trabajadorId', {
-        trabajadorId: query.trabajadorId,
+    if (query.workerId) {
+      qb.andWhere('worker.id = :workerId', {
+        workerId: query.workerId,
       });
     }
 
     if (query.fechaDesde) {
-      qb.andWhere('meeting.fechaReunion >= :fechaDesde', {
+      qb.andWhere('meeting.meetingDate >= :fechaDesde', {
         fechaDesde: new Date(query.fechaDesde),
       });
     }
 
     if (query.fechaHasta) {
-      qb.andWhere('meeting.fechaReunion <= :fechaHasta', {
+      qb.andWhere('meeting.meetingDate <= :fechaHasta', {
         fechaHasta: new Date(query.fechaHasta),
       });
     }
 
     const [meetings, total] = await qb
-      .orderBy('meeting.fechaReunion', 'DESC')
+      .orderBy('meeting.meetingDate', 'DESC')
       .take(query.limit)
       .skip(query.skip)
       .getManyAndCount();
@@ -90,9 +90,9 @@ export class MeetingsService {
     const meeting = await this.repository.findOne({
       where: { id },
       relations: {
-        trabajadores: true,
-        contratos: true,
-        acuerdos: true,
+        workers: true,
+        contracts: true,
+        agreements: true,
       },
     });
 
@@ -107,25 +107,25 @@ export class MeetingsService {
     const meeting = await this.findOne(id);
 
     if (
-      updateMeetingDto.numeroActa &&
-      updateMeetingDto.numeroActa !== meeting.numeroActa
+      updateMeetingDto.actNumber &&
+      updateMeetingDto.actNumber !== meeting.actNumber
     ) {
-      await this.ensureNumeroActaIsAvailable(updateMeetingDto.numeroActa, id);
-      meeting.numeroActa = updateMeetingDto.numeroActa;
+      await this.ensureActNumberIsAvailable(updateMeetingDto.actNumber, id);
+      meeting.actNumber = updateMeetingDto.actNumber;
     }
 
-    if (updateMeetingDto.fechaReunion !== undefined) {
-      meeting.fechaReunion = new Date(updateMeetingDto.fechaReunion);
+    if (updateMeetingDto.meetingDate !== undefined) {
+      meeting.meetingDate = new Date(updateMeetingDto.meetingDate);
     }
 
-    if (updateMeetingDto.ordenDelDia !== undefined) {
-      meeting.ordenDelDia = updateMeetingDto.ordenDelDia;
+    if (updateMeetingDto.agenda !== undefined) {
+      meeting.agenda = updateMeetingDto.agenda;
     }
 
     await this.repository.save(meeting);
 
-    if (updateMeetingDto.trabajadorIds !== undefined) {
-      const workers = await this.loadWorkers(updateMeetingDto.trabajadorIds);
+    if (updateMeetingDto.workerIds !== undefined) {
+      const workers = await this.loadWorkers(updateMeetingDto.workerIds);
       await this.setParticipants(meeting, workers);
     }
 
@@ -135,7 +135,7 @@ export class MeetingsService {
   async remove(id: number): Promise<void> {
     const meeting = await this.findOne(id);
 
-    if (meeting.contratos?.length > 0 || meeting.acuerdos?.length > 0) {
+    if (meeting.contracts?.length > 0 || meeting.agreements?.length > 0) {
       throw new ConflictException(
         `No se puede eliminar el acta porque tiene contratos o acuerdos asociados.`,
       );
@@ -144,17 +144,17 @@ export class MeetingsService {
     await this.repository.remove(meeting);
   }
 
-  private async ensureNumeroActaIsAvailable(
-    numeroActa: string,
+  private async ensureActNumberIsAvailable(
+    actNumber: string,
     ignoreId?: number,
   ): Promise<void> {
     const existing = await this.repository.findOne({
-      where: { numeroActa },
+      where: { actNumber },
     });
 
     if (existing && existing.id !== ignoreId) {
       throw new ConflictException(
-        `Ya existe un acta con el número ${numeroActa}.`,
+        `Ya existe un acta con el número ${actNumber}.`,
       );
     }
   }
@@ -184,11 +184,11 @@ export class MeetingsService {
   ): Promise<void> {
     await this.repository
       .createQueryBuilder()
-      .relation(Meeting, 'trabajadores')
+      .relation(Meeting, 'workers')
       .of(meeting)
       .addAndRemove(
         workers.map((w) => w.id),
-        (meeting.trabajadores ?? []).map((w) => w.id),
+        (meeting.workers ?? []).map((w) => w.id),
       );
   }
 }

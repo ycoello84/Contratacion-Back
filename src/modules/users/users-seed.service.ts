@@ -21,14 +21,14 @@ export class UsersSeedService implements OnModuleInit {
 
     const email = this.configService.get<string>('seed.adminEmail');
     const password = this.configService.get<string>('seed.adminPassword');
-    const nombre = this.configService.get<string>('seed.adminNombre');
+    const name = this.configService.get<string>('seed.adminNombre');
 
     await this.usersService.create({
       email: email as string,
       password: password as string,
-      nombre: nombre as string,
-      rol: UserRole.ADMIN,
-      activo: true,
+      name: name as string,
+      role: UserRole.ADMIN,
+      active: true,
     });
 
     this.logger.warn(
