@@ -3,7 +3,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { DataSource, Repository } from 'typeorm';
+import { Repository } from 'typeorm';
 import {
   buildPaginatedResult,
   PaginatedResult,
@@ -21,7 +21,6 @@ export class WorkersService {
     private readonly repository: Repository<Worker>,
     @InjectRepository(Company)
     private readonly companiesRepository: Repository<Company>,
-    private readonly dataSource: DataSource,
   ) {}
 
   async create(createWorkerDto: CreateWorkerDto): Promise<Worker> {
@@ -122,11 +121,6 @@ export class WorkersService {
 
   async remove(id: number): Promise<void> {
     const worker = await this.findOne(id);
-
-    await this.dataSource.query(
-      'DELETE FROM meeting_workers WHERE worker_id = ?',
-      [id],
-    );
 
     await this.repository.remove(worker);
   }

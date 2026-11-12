@@ -1,30 +1,27 @@
 import 'reflect-metadata';
 import * as bcrypt from 'bcrypt';
 import { DataSource } from 'typeorm';
-import { configuration } from '../config/configuration.js';
 import { User } from '../modules/users/entities/user.entity.js';
 import { UserRole } from '../modules/users/entities/user-role.enum.js';
 
 async function run(): Promise<void> {
-  const config = configuration();
-
   const dataSource = new DataSource({
     type: 'mysql',
-    host: config.database.host,
-    port: config.database.port,
-    username: config.database.username,
-    password: config.database.password,
-    database: config.database.database,
+    host: process.env.DB_HOST ?? 'localhost',
+    port: Number(process.env.DB_PORT ?? 3307),
+    username: process.env.DB_USERNAME ?? 'root',
+    password: process.env.DB_PASSWORD ?? 'rootpassword',
+    database: process.env.DB_DATABASE ?? 'contratacion_db',
     entities: [User],
     synchronize: false,
-    logging: config.database.logging,
+    logging: process.env.DB_LOGGING === 'true',
   });
 
   await dataSource.initialize();
 
   try {
     const repository = dataSource.getRepository(User);
-    const email = config.seed.adminEmail.toLowerCase();
+    const email = (process.env.SEED_ADMIN_EMAIL ?? 'contrahlg@gmail.com').toLowerCase();
     const existing = await repository.findOne({ where: { email } });
 
     if (existing) {
@@ -34,10 +31,10 @@ async function run(): Promise<void> {
 
     const user = repository.create({
       email,
-      name: config.seed.adminNombre,
+      name: process.env.SEED_ADMIN_NOMBRE ?? 'Administrador del sitio',
       role: UserRole.ADMIN,
       active: true,
-      passwordHash: await bcrypt.hash(config.seed.adminPassword, 10),
+      passwordHash: await bcrypt.hash(process.env.SEED_ADMIN_PASSWORD ?? 'Admin123*', 10),
     });
 
     const saved = await repository.save(user);

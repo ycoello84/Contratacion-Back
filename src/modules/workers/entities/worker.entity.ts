@@ -4,14 +4,12 @@ import {
   Entity,
   Index,
   JoinColumn,
-  ManyToMany,
   ManyToOne,
   PrimaryGeneratedColumn,
   type Relation,
   UpdateDateColumn,
 } from 'typeorm';
 import { Company } from '../../companies/entities/company.entity.js';
-import { Meeting } from '../../meetings/entities/meeting.entity.js';
 
 @Entity('workers')
 export class Worker {
@@ -47,7 +45,4 @@ export class Worker {
   @ManyToOne(() => Company, { nullable: true, onDelete: 'SET NULL' })
   @JoinColumn({ name: 'empresa_id' })
   company: Relation<Company> | null;
-
-  @ManyToMany(() => Meeting, (meeting) => meeting.workers)
-  meetings: Relation<Meeting>[];
 }

@@ -10,7 +10,6 @@ import {
   type Relation,
   UpdateDateColumn,
 } from 'typeorm';
-import { Contract } from '../../contracts/entities/contract.entity.js';
 
 @Entity('companies')
 export class Company {
@@ -69,10 +68,4 @@ export class Company {
 
   @UpdateDateColumn()
   updatedAt: Date;
-
-  @OneToMany(() => Contract, (contract) => contract.originCompany)
-  contractsAsOrigin: Relation<Contract>[];
-
-  @OneToMany(() => Contract, (contract) => contract.destinationCompany)
-  contractsAsDestination: Relation<Contract>[];
 }

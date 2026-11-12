@@ -4,16 +4,6 @@ export interface JwtConfig {
   expiresIn: number;
 }
 
-export interface DatabaseConfig {
-  host: string;
-  port: number;
-  username: string;
-  password: string;
-  database: string;
-  synchronize: boolean;
-  logging: boolean;
-}
-
 export interface CorsConfig {
   origin: string[];
 }
@@ -29,17 +19,9 @@ export interface AppConfig {
   port: number;
   apiPrefix: string;
   jwt: JwtConfig;
-  database: DatabaseConfig;
   cors: CorsConfig;
   seed: SeedConfig;
 }
-
-const toBoolean = (value: string | undefined, fallback: boolean): boolean => {
-  if (value === undefined || value === '') {
-    return fallback;
-  }
-  return ['1', 'true', 'yes', 'on'].includes(value.toLowerCase());
-};
 
 const toNumber = (value: string | undefined, fallback: number): number => {
   const parsed = Number(value);
@@ -84,15 +66,6 @@ export const configuration = (): AppConfig => ({
   jwt: {
     secret: process.env.JWT_SECRET ?? 'contratacion-dev-secret',
     expiresIn: parseDurationToSeconds(process.env.JWT_EXPIRES_IN, 3600),
-  },
-  database: {
-    host: process.env.DB_HOST ?? 'localhost',
-    port: toNumber(process.env.DB_PORT, 3307),
-    username: process.env.DB_USERNAME ?? 'root',
-    password: process.env.DB_PASSWORD ?? 'rootpassword',
-    database: process.env.DB_DATABASE ?? 'contratacion_db',
-    synchronize: toBoolean(process.env.DB_SYNCHRONIZE, true),
-    logging: toBoolean(process.env.DB_LOGGING, false),
   },
   cors: {
     origin: (process.env.CORS_ORIGIN ?? '*')

@@ -4,12 +4,11 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { DataSource, Repository } from 'typeorm';
+import { Repository } from 'typeorm';
 import {
   buildPaginatedResult,
   PaginatedResult,
 } from '../../common/dto/pagination.dto.js';
-import { Contract } from '../contracts/entities/contract.entity.js';
 import { CreateCompanyDto } from './dto/create-company.dto.js';
 import { FindCompaniesQueryDto } from './dto/find-companies-query.dto.js';
 import { UpdateCompanyDto } from './dto/update-company.dto.js';
@@ -20,7 +19,6 @@ export class CompaniesService {
   constructor(
     @InjectRepository(Company)
     private readonly repository: Repository<Company>,
-    private readonly dataSource: DataSource,
   ) {}
 
   async create(createCompanyDto: CreateCompanyDto): Promise<Company> {
@@ -152,16 +150,6 @@ export class CompaniesService {
     if (subsidiariesCount > 0) {
       throw new ConflictException(
         `No se puede eliminar la empresa porque tiene ${subsidiariesCount} UEB(s) asociada(s).`,
-      );
-    }
-
-    const contracts = await this.dataSource.getRepository(Contract).count({
-      where: [{ originCompanyId: id }, { destinationCompanyId: id }],
-    });
-
-    if (contracts > 0) {
-      throw new ConflictException(
-        `No se puede eliminar la empresa porque tiene ${contracts} contrato(s) asociado(s).`,
       );
     }
 

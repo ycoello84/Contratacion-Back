@@ -175,4 +175,7 @@ src/
    - Mantener migraciones explícitas o usar TypeORM/Prisma de manera estructurada.
    - Definir llaves foráneas e índices en campos clave (`email`, `identificacion_fiscal`, `estado_aprobacion_cc`, `no_contrato`).
 
+## Arquitectura del proyecto
+Todas las decisiones de diseño y la estructura de entidades deben consultarse en `docs/architecture/arquitectura_unificada_entidades_y_seeds_sistema_ecie.md`. Antes de implementar cualquier funcionalidad, lee primero este archivo y sigue sus convenciones.
+
 ## ACTUALIZAR SIEMPRE el fichero MEMORY.md con los cambios que se desarrollen, para tener un historial de cambios   
