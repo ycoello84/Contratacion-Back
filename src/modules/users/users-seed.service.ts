@@ -13,26 +13,38 @@ export class UsersSeedService implements OnModuleInit {
   ) {}
 
   async onModuleInit(): Promise<void> {
-    const total = await this.usersService.count();
+    await this.seedAdminUser();
+  }
 
-    if (total > 0) {
-      return;
-    }
-
+  async seedAdminUser(): Promise<void> {
     const email = this.configService.get<string>('seed.adminEmail');
     const password = this.configService.get<string>('seed.adminPassword');
     const name = this.configService.get<string>('seed.adminNombre');
 
+    if (!email || !password || !name) {
+      this.logger.warn(
+        'Seed de administrador omitido: faltan SEED_ADMIN_EMAIL, SEED_ADMIN_PASSWORD o SEED_ADMIN_NOMBRE.',
+      );
+      return;
+    }
+
+    const existing = await this.usersService.findByEmailWithPassword(email);
+
+    if (existing) {
+      this.logger.log(`Usuario administrador seed ya existe (${email}).`);
+      return;
+    }
+
     await this.usersService.create({
-      email: email as string,
-      password: password as string,
-      name: name as string,
+      email,
+      password,
+      name,
       role: UserRole.ADMIN,
       active: true,
     });
 
     this.logger.warn(
-      `Usuario administrador inicial creado (${email}). Cambie la contraseña en el primer acceso.`,
+      `Usuario administrador seed creado (${email}). Cambie la contraseña si es necesario.`,
     );
   }
 }

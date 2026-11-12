@@ -101,9 +101,9 @@ export const configuration = (): AppConfig => ({
       .filter((origin) => origin.length > 0),
   },
   seed: {
-    adminEmail: process.env.SEED_ADMIN_EMAIL ?? 'admin@contratacion.local',
-    adminPassword: process.env.SEED_ADMIN_PASSWORD ?? 'Admin123!',
-    adminNombre: process.env.SEED_ADMIN_NOMBRE ?? 'Administrador',
+    adminEmail: process.env.SEED_ADMIN_EMAIL ?? 'contrahlg@gmail.com',
+    adminPassword: process.env.SEED_ADMIN_PASSWORD ?? 'Admin123*',
+    adminNombre: process.env.SEED_ADMIN_NOMBRE ?? 'Administrador del sitio',
   },
 });
 

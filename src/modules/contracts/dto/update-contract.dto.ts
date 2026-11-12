@@ -54,7 +54,7 @@ export class UpdateContractDto {
     {},
     { message: 'El valor debe ser una cadena numérica o decimal válida.' },
   )
-  value?: string | null;
+  contractValue?: string | null;
 
   @IsOptional()
   @IsBoolean()

@@ -53,7 +53,7 @@ export class CreateContractDto {
     {},
     { message: 'El valor debe ser una cadena numérica o decimal válida.' },
   )
-  value?: string;
+  contractValue?: string;
 
   @IsOptional()
   @IsBoolean()

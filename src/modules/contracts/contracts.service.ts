@@ -62,7 +62,7 @@ export class ContractsService {
       originCompanyId: createContractDto.originCompanyId,
       destinationCompanyId: createContractDto.destinationCompanyId,
       specializedArea: createContractDto.specializedArea ?? null,
-      value: createContractDto.value ?? null,
+      value: createContractDto.contractValue ?? null,
       noValueReference: createContractDto.noValueReference ?? false,
       uebEntryDate: createContractDto.uebEntryDate ?? null,
       opinionIssueDate: createContractDto.opinionIssueDate ?? null,
@@ -241,8 +241,8 @@ export class ContractsService {
       contract.specializedArea = updateContractDto.specializedArea;
     }
 
-    if (updateContractDto.value !== undefined) {
-      contract.value = updateContractDto.value;
+    if (updateContractDto.contractValue !== undefined) {
+      contract.value = updateContractDto.contractValue;
     }
 
     if (updateContractDto.noValueReference !== undefined) {

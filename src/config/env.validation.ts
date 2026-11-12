@@ -65,15 +65,15 @@ export class EnvironmentVariables {
 
   @IsString()
   @IsNotEmpty()
-  SEED_ADMIN_EMAIL: string = 'admin@contratacion.local';
+  SEED_ADMIN_EMAIL: string = 'contrahlg@gmail.com';
 
   @IsString()
   @IsNotEmpty()
-  SEED_ADMIN_PASSWORD: string = 'Admin123!';
+  SEED_ADMIN_PASSWORD: string = 'Admin123*';
 
   @IsString()
   @IsNotEmpty()
-  SEED_ADMIN_NOMBRE: string = 'Administrador';
+  SEED_ADMIN_NOMBRE: string = 'Administrador del sitio';
 
   @IsIn(['development', 'test', 'production'])
   APP_ENV: string = 'development';
