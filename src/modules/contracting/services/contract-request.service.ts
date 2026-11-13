@@ -12,7 +12,11 @@ import {
 } from '../../../common/dto/pagination.dto.js';
 import { CreateContractRequestDto } from '../dto/create-contract-request.dto.js';
 import { FindContractRequestsQueryDto } from '../dto/find-contract-requests-query.dto.js';
+import { UpdateContractRequestDto } from '../dto/update-contract-request.dto.js';
 import { ContractRequest } from '../entities/contract-request.entity.js';
+import { ContractType } from '../entities/contract-type.entity.js';
+import { Counterparty } from '../entities/counterparty.entity.js';
+import { SpecializedArea } from '../entities/specialized-area.entity.js';
 import {
   AmountType,
   InstrumentCategory,
@@ -28,6 +32,12 @@ export class ContractRequestService {
   constructor(
     @InjectRepository(ContractRequest)
     private readonly requestRepo: Repository<ContractRequest>,
+    @InjectRepository(Counterparty)
+    private readonly counterpartyRepo: Repository<Counterparty>,
+    @InjectRepository(ContractType)
+    private readonly contractTypeRepo: Repository<ContractType>,
+    @InjectRepository(SpecializedArea)
+    private readonly specializedAreaRepo: Repository<SpecializedArea>,
     private readonly dataSource: DataSource,
   ) {}
 
@@ -163,6 +173,50 @@ export class ContractRequestService {
   }
 
   /**
+   * Actualiza parcialmente una solicitud validando unicidad de código ECIE
+   * (excluyendo a sí misma), reglas de jerarquía padre-hijo y coherencia entre
+   * modalidad de valor y monto numérico.
+   */
+  async update(id: string, dto: UpdateContractRequestDto): Promise<ContractRequest> {
+    const request = await this.findOne(id);
+
+    if (dto.ecieInternalCode && dto.ecieInternalCode !== request.ecieInternalCode) {
+      const existing = await this.requestRepo.findOne({
+        where: { ecieInternalCode: dto.ecieInternalCode },
+      });
+      if (existing) {
+        throw new ConflictException(
+          `El código interno ${dto.ecieInternalCode} ya se encuentra registrado.`,
+        );
+      }
+    }
+
+    const instrumentCategory = dto.instrumentCategory ?? request.instrumentCategory;
+    const parentContractId = dto.parentContractId ?? request.parentContractId;
+
+    if (
+      instrumentCategory !== InstrumentCategory.MASTER_CONTRACT &&
+      !parentContractId
+    ) {
+      throw new BadRequestException(
+        'Un Contrato Específico o Suplemento debe estar vinculado a un Contrato Principal (parentContractId).',
+      );
+    }
+
+    const amountType = dto.amountType ?? request.amountType;
+    const amount = dto.amount !== undefined ? dto.amount : request.amount;
+
+    if (amountType !== AmountType.FIXED_AMOUNT && amount != null) {
+      throw new BadRequestException(
+        'Los contratos de tipo SUMMATION o NO_VALUE_REFERRED no deben tener un monto fijo asignado.',
+      );
+    }
+
+    this.requestRepo.merge(request, dto);
+    return this.requestRepo.save(request);
+  }
+
+  /**
    * Calcula la ejecución financiera acumulada de un Contrato Marco sumando
    * todos sus contratos específicos y suplementos aprobados.
    */
@@ -214,6 +268,27 @@ export class ContractRequestService {
           .of(requestId)
           .add(resolutionId);
       }
+    });
+  }
+
+  async findAllCounterparties(): Promise<Counterparty[]> {
+    return this.counterpartyRepo.find({
+      where: { isActive: true },
+      order: { officialName: 'ASC' },
+    });
+  }
+
+  async findAllContractTypes(): Promise<ContractType[]> {
+    return this.contractTypeRepo.find({
+      where: { isActive: true },
+      order: { name: 'ASC' },
+    });
+  }
+
+  async findAllSpecializedAreas(): Promise<SpecializedArea[]> {
+    return this.specializedAreaRepo.find({
+      where: { isActive: true },
+      order: { name: 'ASC' },
     });
   }
 }

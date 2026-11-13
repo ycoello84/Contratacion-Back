@@ -6,12 +6,14 @@ import {
   HttpCode,
   HttpStatus,
   Param,
+  Patch,
   Post,
   Query,
 } from '@nestjs/common';
 import { ContractRequestService } from './services/contract-request.service.js';
 import { CreateContractRequestDto } from './dto/create-contract-request.dto.js';
 import { FindContractRequestsQueryDto } from './dto/find-contract-requests-query.dto.js';
+import { UpdateContractRequestDto } from './dto/update-contract-request.dto.js';
 import { ContractRequest } from './entities/contract-request.entity.js';
 import { Roles } from '../../common/decorators/roles.decorator.js';
 import { UserRole } from '../../modules/users/entities/user-role.enum.js';
@@ -35,6 +37,15 @@ export class ContractingController {
   @Get('requests/:id')
   findOne(@Param('id') id: string): Promise<ContractRequest> {
     return this.service.findOne(id);
+  }
+
+  @Roles(UserRole.ADMIN, UserRole.GESTOR)
+  @Patch('requests/:id')
+  update(
+    @Param('id') id: string,
+    @Body() dto: UpdateContractRequestDto,
+  ): Promise<ContractRequest> {
+    return this.service.update(id, dto);
   }
 
   @Get('requests/:id/execution-summary')
@@ -62,5 +73,20 @@ export class ContractingController {
   @Get('status-metadata')
   statusMetadata() {
     return REQUEST_STATUS_METADATA;
+  }
+
+  @Get('counterparties')
+  findAllCounterparties() {
+    return this.service.findAllCounterparties();
+  }
+
+  @Get('contract-types')
+  findAllContractTypes() {
+    return this.service.findAllContractTypes();
+  }
+
+  @Get('specialized-areas')
+  findAllSpecializedAreas() {
+    return this.service.findAllSpecializedAreas();
   }
 }
